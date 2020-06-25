@@ -112,140 +112,152 @@ ipcMain.on("device-name", (e, arg) => {
       var content = {path : path, name : name, labels : labels}
       label_result.push(content);
     }
-var video_label_result = new Array();
-var video_detect_result = new Array();
-
-ipcMain.on("video-analysis", async (e, arg) => {
-    console.log(arg + "from menu_media");
-    video_label_result = [];
-    video_detect_result = [];
-
-    await Promise.all(arg.map(async (value)=>{
-      // await copy_file(value);
-      // setTimeout(function() { }, 10000);
-      await get_content_detection(value);
-      // await get_videolabels(value);
-    }))
-    await Promise.all(arg.map(async (value)=>{
-      // await copy_file(value);
-      // setTimeout(function() { }, 10000);
-      //await get_content_detection(value);
-      await get_videolabels(value);
-    }))
-    var video_analysis_result = [video_label_result,video_detect_result];
-    console.log(video_analysis_result);
-    win.webContents.send("getvideodetail", video_analysis_result);
-
-    //win.webContents.send("getvideodetail", [temp_label,temp_detect]);
-
-
-});
-
-function checkandcopy(arg){
-  return new Promise(function(resolve, reject){
-      setTimeout(function(){
-          for(var i=0; i < arg.length; i++){
-            cmd_pull = exec('adb pull '+arg[i]);
-          }
-          resolve(true);           
-      }, 1000)
-  })
-}
-
-async function copy_file(path){
-  return new Promise(function(resolve, reject){
-    setTimeout(function(){
-      cmd_pull = exec('adb pull '+path,function(error, stdout, stderr){
-        if(error){
-          console.log(error);
-        }
-      });
-        resolve(true);           
-    }, 1000)
-  })
-}
-
-
-
-function send_labels_to_menu_media(event){
-  win.webContents.send("getvideodetail", 'response message');
-}
-
-async function get_videolabels(path){
-  var video_name = path.split('/');
-  video_name = video_name[video_name.length-1];
-
-  // Creates a client
-  const client = new video.VideoIntelligenceServiceClient();
-
-  var video_path = __dirname+'\\' + video_name;
-  var temp = video_path.split('\\');
-  var beforeslice = '';
-  for(var i = 0; i < temp.length; i++){
-    beforeslice += temp[i] + '/';
-  }
-
-  const vpath = beforeslice.slice(0,-1);
-  console.log(vpath);
-  // Reads a local video file and converts it to base64
-  const readFile = util.promisify(fs.readFile);
-  const file = await readFile(vpath);
-  const inputContent = file.toString('base64');
-  console.log("video convert");
-
-  // Constructs request
-  const request = {
-  inputContent: inputContent,
-  features: ['LABEL_DETECTION'],
-  };
-
-  // Detects labels in a video
-  const [operation] = await client.annotateVideo(request);
-  console.log('Waiting for operation to complete...');
-  const [operationResult] = await operation.promise();
-  // Gets annotations for video
-  const annotations = operationResult.annotationResults[0];
-
-  
-  const labels = annotations.segmentLabelAnnotations;
-  console.log(labels);
-  var content = {video : video_name,labels : []}
-  labels.forEach(label => {
-      console.log(`Label ${label.entity.description} occurs at:`);
-      content['labels'].push(label.entity.description);
-      content[label.entity.description] = [];
-      label.segments.forEach(segment => {
-          const time = segment.segment;
-          if (time.startTimeOffset.seconds === undefined) {
-          time.startTimeOffset.seconds = 0;
-          }
-          if (time.startTimeOffset.nanos === undefined) {
-          time.startTimeOffset.nanos = 0;
-          }
-          if (time.endTimeOffset.seconds === undefined) {
-          time.endTimeOffset.seconds = 0;
-          }
-          if (time.endTimeOffset.nanos === undefined) {
-          time.endTimeOffset.nanos = 0;
-          }
-          console.log(
-          `\tStart: ${time.startTimeOffset.seconds}` +
-              `.${(time.startTimeOffset.nanos / 1e6).toFixed(0)}s`
-          );
-          console.log(
-          `\tEnd: ${time.endTimeOffset.seconds}.` +
-              `${(time.endTimeOffset.nanos / 1e6).toFixed(0)}s`
-          );
-          console.log(`\tConfidence: ${segment.confidence}`);
-          var temp = [time.startTimeOffset.seconds + '.' + (time.startTimeOffset.nanos / 1e6).toFixed(0),
-                      time.endTimeOffset.seconds + '.' + (time.endTimeOffset.nanos / 1e6).toFixed(0),
-                      segment.confidence];
-          content[label.entity.description].push(temp);
-      });
-  });
-  console.log(content);
-  video_label_result.push(content);
-}
+    var video_label_result = new Array();
+    var video_detect_result = new Array();
+    
+    ipcMain.on("video-analysis", async (e, arg) => {
+        console.log(arg + "from menu_media");
+        video_label_result = [];
+        video_detect_result = [];
+    
+        await Promise.all(arg.map(async (value)=>{
+          await copy_file(value);
+          await get_video_analysis(value);
+        }))
+    
+        var video_analysis_result = [video_label_result,video_detect_result];
+        console.log(video_analysis_result);
+        win.webContents.send("getvideodetail", video_analysis_result);
+    
+    });
+    
+    async function copy_file(path){
+      return new Promise(function(resolve, reject){
+        setTimeout(function(){
+          cmd_pull = exec('adb pull '+path,function(error, stdout, stderr){
+            if(error){
+              console.log(error);
+            }
+            else{
+              console.log("copy");
+              resolve(true);
+            }
+          })
+        }, 1000)
+      })
+    }
+    
+    async function get_video_analysis(path){
+      var video_name = path.split('/');
+      video_name = video_name[video_name.length-1];
+    
+      // Creates a client
+      const client = new video.VideoIntelligenceServiceClient();
+    
+      var video_path = __dirname+'\\' + video_name;
+      var temp = video_path.split('\\');
+      var beforeslice = '';
+      for(var i = 0; i < temp.length; i++){
+        beforeslice += temp[i] + '/';
+      }
+    
+      const vpath = beforeslice.slice(0,-1);
+      console.log(vpath);
+      // Reads a local video file and converts it to base64
+      const readFile = util.promisify(fs.readFile);
+      const file = await readFile(vpath);
+      const inputContent = file.toString('base64');
+      console.log("video convert");
+    
+      const request = {
+        inputContent: inputContent,
+        features: ['LABEL_DETECTION','EXPLICIT_CONTENT_DETECTION'],
+        };
+    
+        // Human-readable likelihoods
+        const likelihoods = [
+        'UNKNOWN',
+        'VERY_UNLIKELY',
+        'UNLIKELY',
+        'POSSIBLE',
+        'LIKELY',
+        'VERY_LIKELY',
+        ];
+    
+        // Detects unsafe content
+        const [opertaion] = await client.annotateVideo(request);
+        console.log('Waiting for operation to complete...');
+        const [operationResult] = await opertaion.promise();
+        // Gets unsafe content
+        const explicitContentResults =
+        operationResult.annotationResults[0].explicitAnnotation;
+        console.log('Explicit annotation results:');
+        var content1 = {video : video_name, likelihood : []}
+        explicitContentResults.frames.forEach(result => {
+            if (result.timeOffset === undefined) {
+                result.timeOffset = {};
+            }
+            if (result.timeOffset.seconds === undefined) {
+                result.timeOffset.seconds = 0;
+            }
+            if (result.timeOffset.nanos === undefined) {
+                result.timeOffset.nanos = 0;
+            }
+            console.log(
+                `\tTime: ${result.timeOffset.seconds}` +
+                `.${(result.timeOffset.nanos / 1e6).toFixed(0)}s`
+            );
+            console.log(
+                `\t\tPornography likelihood: ${likelihoods[result.pornographyLikelihood]}`
+            );
+            var temp = [result.timeOffset.seconds + '.' + (result.timeOffset.nanos / 1e6).toFixed(0),
+                          likelihoods[result.pornographyLikelihood]];
+            content1['likelihood'].push(temp);
+        });
+    
+    
+        const annotations = operationResult.annotationResults[0];
+    
+      
+        const labels = annotations.segmentLabelAnnotations;
+        var content2 = {video : video_name,labels : []}
+        labels.forEach(label => {
+            console.log(`Label ${label.entity.description} occurs at:`);
+            content2['labels'].push(label.entity.description);
+            content2[label.entity.description] = [];
+            label.segments.forEach(segment => {
+                const time = segment.segment;
+                if (time.startTimeOffset.seconds === undefined) {
+                time.startTimeOffset.seconds = 0;
+                }
+                if (time.startTimeOffset.nanos === undefined) {
+                time.startTimeOffset.nanos = 0;
+                }
+                if (time.endTimeOffset.seconds === undefined) {
+                time.endTimeOffset.seconds = 0;
+                }
+                if (time.endTimeOffset.nanos === undefined) {
+                time.endTimeOffset.nanos = 0;
+                }
+                console.log(
+                `\tStart: ${time.startTimeOffset.seconds}` +
+                    `.${(time.startTimeOffset.nanos / 1e6).toFixed(0)}s`
+                );
+                console.log(
+                `\tEnd: ${time.endTimeOffset.seconds}.` +
+                    `${(time.endTimeOffset.nanos / 1e6).toFixed(0)}s`
+                );
+                console.log(`\tConfidence: ${segment.confidence}`);
+                var temp = [time.startTimeOffset.seconds + '.' + (time.startTimeOffset.nanos / 1e6).toFixed(0),
+                            time.endTimeOffset.seconds + '.' + (time.endTimeOffset.nanos / 1e6).toFixed(0),
+                            segment.confidence];
+                content2[label.entity.description].push(temp);
+            });
+        });
+    
+        video_detect_result.push(content1);
+        video_label_result.push(content2);
+    }
 
 async function get_content_detection(path){
   var video_name = path.split('/');

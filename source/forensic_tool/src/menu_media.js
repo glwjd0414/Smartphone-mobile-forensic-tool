@@ -5,19 +5,64 @@ const offset = new Date().getTimezoneOffset() * 60000;
 var exec = require('child_process').exec, child;
 var mypiechart = null;
 
-
-
-
-function el(selector) {
-    return document.getElementById(selector);
-}
-function cl(selector) {
-    return document.getElementsByClassName(selector);
-}
-
-
 const videoanalysis = document.getElementById("temp_post");
 
+
+document.addEventListener("DOMContentLoaded", function(){
+    getMediaChart();
+    getStorageStructure('photo');
+    video_list();
+  });
+
+//Tap change
+function openTap(tabName) {
+    var i;
+    var x = document.getElementsByClassName("menu");
+    for (i = 0; i < x.length; i++) {
+        x[i].style.display = "none"
+    }
+    document.getElementById(tabName).style.display = "block";
+}
+
+//Show video list for analysis
+var video_list = function getVideolist(filetype){
+    return new Promise(function(resolve, reject){
+        setTimeout( function(){
+            document.querySelector('#videotable > tbody').innerHTML = `<tr><th></th>
+                                                                        <th>name</th>\
+                                                                        <th>date_added</th>\
+                                                                        <th>resolution</th>\
+                                                                        <th>size</th>\
+                                                                    </tr>`;
+            const db = new sqlite3.Database('InnerDatabase.db');
+            let sql = `select display_name as name, date_added, path, resolution, size
+                        from video;`
+            log.info("video_list Query start");
+            db.all(sql, [], (err, rows) => {
+                if (err) {
+                  log.err(err);
+                  reject(err);
+                  throw err;
+                }
+                else{
+                    log.info("video_list Query succesfully executed");
+                    rows.forEach((row) => {
+                        getByte(row.size).then(function(bytedata) {
+                            document.querySelector('#videotable > tbody').innerHTML += `<tr><td><div class="form-check">
+                            <input class="form-check-input position-static" type="checkbox" id="blankCheckbox" value="${row.path}">
+                          </div></td>
+                            <td>${row.name}</td><td>${new Date(row.date_added*1000-offset).toISOString().replace(/T/, ' ').replace(/\..+/, '')}</td><td>${row.resolution}</td><td>${bytedata}</td></tr>`
+                        });
+                    });
+                    db.close();
+                    resolve(true);
+                }
+              });             
+        }, 1000)
+    })
+}
+
+//Request video analysis when click button
 videoanalysis.addEventListener("click", ()=>{
     Promise.all([check()]).then(function(value){
         ipcRenderer.send(
@@ -25,14 +70,9 @@ videoanalysis.addEventListener("click", ()=>{
             value[0]
           );
       });
-    // check().then(copy).then(result => {
-    //     ipcRenderer.send(
-    //         "video-analysis",
-    //         result
-    //         );
-    // })
 });
 
+//Find which video checked
 var check = function checkboxcheck(){
     return new Promise(function(resolve, reject){
         setTimeout(function(){
@@ -49,22 +89,7 @@ var check = function checkboxcheck(){
     })
 }
 
-var copy = function copyfiles(values){
-    return new Promise(function(resolve, reject){
-        setTimeout(function(){
-            values.forEach((value)=>{
-            cmd_pull = exec('adb pull '+value,function(error, stdout, stderr){
-                if(error){
-                  console.log(error);
-                }
-              });
-            });
-            resolve(values);           
-        }, 1000)
-    })
-}
-
-
+//Get videodetail from main
 ipcRenderer.on("getvideodetail", (e, arg) => {
     log.info(arg + " from main");
     Promise.all([popvideoanalysis(arg)]).then(function(value){
@@ -79,13 +104,7 @@ ipcRenderer.on("getvideodetail", (e, arg) => {
       });
 });
 
-document.addEventListener("DOMContentLoaded", function(){
-    getMediaChart();
-    getStorageStructure('photo');
-    video_list();
-  });
-
-
+//Show video analysis result
 var popvideoanalysis = function popVideoAnalysis(arg){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
@@ -149,7 +168,6 @@ var popvideoanalysis = function popVideoAnalysis(arg){
                 </div>
             </div>`;
                 document.querySelector('#va_list').innerHTML += html;
-                // var ctx = document.getElementById('det_piechart_'+lb_dict['video']).getContext("2d");
                 var config = {
                             type: 'pie',
                             data: {
@@ -165,30 +183,21 @@ var popvideoanalysis = function popVideoAnalysis(arg){
                             },
                         }
                 mydectpiechart.push(['det_piechart_'+lb_dict['video'],config]);
-                // mydectpiechart[k] = new Chart(ctx, config);
-                // log.info('det_piechart_'+lb_dict['video'] +" dect pie chart create");
-            }
+                }
           resolve(mydectpiechart);
         }, 1000)
     })
 
 }
 
-function openTap(tabName) {
-    var i;
-    var x = document.getElementsByClassName("menu");
-    for (i = 0; i < x.length; i++) {
-      x[i].style.display = "none"
-    }
-    document.getElementById(tabName).style.display = "block";
-  }
-
+//Draw piechart for Media type
 function getMediaChart(){
     Promise.all([drawpiechart()]).then(function(value){
         log.info("getMediaChart finished")
       });
 }
 
+//Get Storage structure for specific media type
 function getStorageStructure(filetype){
     document.querySelector('#mediafile_struct > div').innerHTML = '';
     document.querySelector('#filetable > tbody').innerHTML = '';
@@ -223,6 +232,7 @@ function getStorageStructure(filetype){
     }
 }
 
+//Get file list of specific filetype in folder
 function getFilelistinFolder(foldername,filetype){
     log.info("getFilelistinFolder start")
     document.querySelector('#filetable > tbody').innerHTML = `<tr><th>name</th>\
@@ -240,6 +250,7 @@ function getFilelistinFolder(foldername,filetype){
     document.getElementById('filelist_for_folder').style.display = "block";
 }
 
+//draw piechart for Media type
 var drawpiechart = function drawPieChart(){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
@@ -274,13 +285,14 @@ var drawpiechart = function drawPieChart(){
                             <div class="d-flex justify-content-between pt-1 pb-1"><a style="font-weight: bold;">Audio </a><a>${b[2]}</a></div>
                             <div class="d-flex justify-content-between pt-1 pb-1"><a style="font-weight: bold;">Document </a><a>${b[3]}</a></div>`         
                 document.querySelector('#pie_datalist').innerHTML = html;  
+                });
             });
-        });
           resolve(true);
         }, 1000)
     })
-  }
+}
 
+//Change byte to kb, mb, gb
 var getByte = function getB(byte){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
@@ -297,7 +309,8 @@ var getByte = function getB(byte){
     })
 }
 
-var filetype_all_size = function getAllAudioSize(filetype){
+//Get all file size of specific media type
+var filetype_all_size = function getAllMediaTypeSize(filetype){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
             const db = new sqlite3.Database('InnerDatabase.db');
@@ -319,6 +332,7 @@ var filetype_all_size = function getAllAudioSize(filetype){
     })
 }
 
+//Get folder names that specific filetype located
 var file_struct = function getStruct(filetype){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
@@ -343,6 +357,7 @@ var file_struct = function getStruct(filetype){
     })
 }
 
+//Get files of specific filetype in folder
 var fileinfolder = function getFileinFolder(foldername,filetype){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
@@ -381,43 +396,6 @@ var fileinfolder = function getFileinFolder(foldername,filetype){
                     log.info("fileinfolder Query succesfully executed");
                     db.close();
                     resolve(rows);
-                }
-              });             
-        }, 1000)
-    })
-}
-
-var video_list = function getVideolist(filetype){
-    return new Promise(function(resolve, reject){
-        setTimeout( function(){
-            document.querySelector('#videotable > tbody').innerHTML = `<tr><th></th>
-                                                                        <th>name</th>\
-                                                                        <th>date_added</th>\
-                                                                        <th>resolution</th>\
-                                                                        <th>size</th>\
-                                                                    </tr>`;
-            const db = new sqlite3.Database('InnerDatabase.db');
-            let sql = `select display_name as name, date_added, path, resolution, size
-                        from video;`
-            log.info("video_list Query start");
-            db.all(sql, [], (err, rows) => {
-                if (err) {
-                  log.err(err);
-                  reject(err);
-                  throw err;
-                }
-                else{
-                    log.info("video_list Query succesfully executed");
-                    rows.forEach((row) => {
-                        getByte(row.size).then(function(bytedata) {
-                            document.querySelector('#videotable > tbody').innerHTML += `<tr><td><div class="form-check">
-                            <input class="form-check-input position-static" type="checkbox" id="blankCheckbox" value="${row.path}">
-                          </div></td>
-                            <td>${row.name}</td><td>${new Date(row.date_added*1000-offset).toISOString().replace(/T/, ' ').replace(/\..+/, '')}</td><td>${row.resolution}</td><td>${bytedata}</td></tr>`
-                        });
-                    });
-                    db.close();
-                    resolve(true);
                 }
               });             
         }, 1000)

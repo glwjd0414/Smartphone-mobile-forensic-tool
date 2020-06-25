@@ -2,23 +2,14 @@ const log = require('electron-log')
 const sqlite3 = require('sqlite3').verbose();
 const offset = new Date().getTimezoneOffset() * 60000;
 var mychart = null;
-function el(selector) {
-    return document.getElementById(selector);
-}
-function cl(selector) {
-    return document.getElementsByClassName(selector);
-}
 
-// window.onload=function(){
-//     getAppInfoList();
-//     getDeletedAppList();
-// }
 document.addEventListener("DOMContentLoaded", function(){
     getAppInfoList('totaltime');
     getDeletedAppList();
     getRecentUsage();
   });
 
+//Tap change
 function openTap(tabName) {
   var i;
   var x = document.getElementsByClassName("menu");
@@ -28,11 +19,7 @@ function openTap(tabName) {
   document.getElementById(tabName).style.display = "block";
 }
 
-function testClick(tabName) {
-  log.info("testclick")
-}
-
-
+//Get AppinfoList sort by (wifiusage/cellularusage/totoltimeforeground)
 function getAppInfoList(sort_column){
     const db = new sqlite3.Database('InnerDatabase.db');
     var html = ''
@@ -107,119 +94,14 @@ function getAppInfoList(sort_column){
       db.close();
   }
 
-function getDeletedAppList(){
-    const db = new sqlite3.Database('InnerDatabase.db');
-    var html = ''
-    let sql = `SELECT AppUsageYear.lasttimeused, AppUsageYear.packagename, SUM(AppUsageYear.totaltimeforeground) as totaltime FROM AppUsageYear
-    WHERE AppUsageYear.packagename NOT in (select Appinfo.packagename from AppInfo)
-    GROUP BY AppUsageYear.packagename
-    ORDER BY totaltime desc;`
-    log.info("Query start");
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-          log.err(err);
-          throw err;
-        }
-        rows.forEach((row) => {
-          var totaltime;
-          if(row.totaltime> 3600000){
-            totaltime = (row.totaltime/3600000).toFixed(2) + "Hour";
-          }
-          else if(row.totaltime > 60000){
-            totaltime = (row.totaltime/60000).toFixed(2) + "Minute";
-          }
-          else if(row.totaltime > 1000){
-            totaltime = (row.totaltime/1000).toFixed(2) + "Seconds";
-          }
-          html += `<div class="media pt-3">
-          <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-            <strong class="d-block">${row.packagename}</strong>
-            <a class="font-weight-bold">총 사용 시간</a>
-            <a>${totaltime}</a><br>
-            <a class="font-weight-bold">마지막 사용 시간</a>
-            <a>${new Date(row.lasttimeused-offset).toISOString().replace(/T/, ' ').replace(/\..+/, '')}</a><br>
-            <a href="https://play.google.com/store/apps/details?id=${row.packagename}" onclick="window.open(this.href); return false">Follow</a>
-            </p>
-        </div>
-        `
-          });
-        document.querySelector('#deletedapplist').innerHTML = html;
-        log.info("Query succesfully executed");
-      });
-     db.close();
-  }
-
-function getRecentUsage(){
-  Promise.all([draw_recent_piechart(),listtop10(),get_recent_dataset()]).then(function(value){
-    log.info("getRecentUsage finished")
-  });
-}
-
+//show app detail when click app in appinfolist
 function getAppDetail(packagename){
   Promise.all([drawpiechart(packagename),drawbarchart(packagename)]).then(function(value){
     log.info("getAppDetail finished")
   });
 }
-//Recent Usage 차트그리기
-var draw_recent_piechart = function drawRecentPieChart(){
-  return new Promise(function(resolve, reject){
-      setTimeout( function(){
-        log.info("pie10 draw start");
-        Promise.all([top10_day(),totaltimeday()]).then(function(value){
-          log.info("pie10 draw start");
-          var recent_labels = [];
-          var recent_datasets = [];
-          var except = 0;
-          value[0].forEach((row) => {
-            recent_labels.push(row.name);
-            recent_datasets.push(row.totaltime);
-            except += row.totaltime;
-          });
-          recent_labels.push("그 외");
-          recent_datasets.push(value[1]-except);
-          var ctxP = document.getElementById("pieChart10").getContext('2d');
-          var myPieChart10 = new Chart(ctxP, {
-            type: 'pie',
-            data: {
-                labels: recent_labels,
-                datasets: [{
-                data: recent_datasets,
-                backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#9B59B6", "#2471A3", "#3498DB", "#F39C12","#16A085","#E91E63","#949FB1", "#4D5360"],
-                hoverBackgroundColor: ["#FF5A5E", "#5AD3D1", "#FFC870", "#AF7AC5 ", "#2980B9","#5DADE2", "#F5B041","#45B39D","#EC407A","#A8B3C5", "#616774"]
-                }]
-            },
-            options: {
-                responsive: false
-            }
-          });
-          log.info("pie10 chart draw draw draw")
-        });
-        resolve(true);
-      }, 1000)
-  })
-}
 
-var listtop10 = function listTop10(){
-  return new Promise(function(resolve, reject){
-      setTimeout( function(){
-        log.info("listtop10 draw start");
-        Promise.all([top10_day()]).then(function(value){
-          log.info("listtop10 draw start");
-          var html = `<a class="border-bottom border-gray pb-2 mb-0 font-nanum">사용 시간 Top10</a><br>`;
-          var index = 1;
-          value[0].forEach((row) => {
-            html += `<div class="pl-1 pt-1"><a class="pb-1" style="font-size: 15px">${index}. ${row.name}</a><br></div>`;
-            index++;
-          });
-          document.querySelector('#top10list').innerHTML = html;
-          log.info("listtop10 chart draw draw draw")
-        });
-        resolve(true);
-      }, 1000)
-  })
-}
-
-//AppList 차트그리기
+//Draw Appdetail piechart
 var drawpiechart = function drawPieChart(packagename){
   return new Promise(function(resolve, reject){
       setTimeout( function(){
@@ -295,6 +177,7 @@ var drawpiechart = function drawPieChart(packagename){
   })
 }
 
+//Draw Appdetail barchart
 var drawbarchart = function drawBarChart(packagename){
   return new Promise(function(resolve, reject){
       setTimeout( function(){
@@ -392,6 +275,117 @@ var drawbarchart = function drawBarChart(packagename){
   })
 }
 
+//Get DeletedAppList
+function getDeletedAppList(){
+    const db = new sqlite3.Database('InnerDatabase.db');
+    var html = ''
+    let sql = `SELECT AppUsageYear.lasttimeused, AppUsageYear.packagename, SUM(AppUsageYear.totaltimeforeground) as totaltime FROM AppUsageYear
+    WHERE AppUsageYear.packagename NOT in (select Appinfo.packagename from AppInfo)
+    GROUP BY AppUsageYear.packagename
+    ORDER BY totaltime desc;`
+    log.info("Query start");
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+          log.err(err);
+          throw err;
+        }
+        rows.forEach((row) => {
+          var totaltime;
+          if(row.totaltime> 3600000){
+            totaltime = (row.totaltime/3600000).toFixed(2) + "Hour";
+          }
+          else if(row.totaltime > 60000){
+            totaltime = (row.totaltime/60000).toFixed(2) + "Minute";
+          }
+          else if(row.totaltime > 1000){
+            totaltime = (row.totaltime/1000).toFixed(2) + "Seconds";
+          }
+          html += `<div class="media pt-3">
+          <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+            <strong class="d-block">${row.packagename}</strong>
+            <a class="font-weight-bold">총 사용 시간</a>
+            <a>${totaltime}</a><br>
+            <a class="font-weight-bold">마지막 사용 시간</a>
+            <a>${new Date(row.lasttimeused-offset).toISOString().replace(/T/, ' ').replace(/\..+/, '')}</a><br>
+            <a href="https://play.google.com/store/apps/details?id=${row.packagename}" onclick="window.open(this.href); return false">Follow</a>
+            </p>
+        </div>
+        `
+          });
+        document.querySelector('#deletedapplist').innerHTML = html;
+        log.info("Query succesfully executed");
+      });
+     db.close();
+  }
+
+//Set Recent Usage page
+function getRecentUsage(){
+  Promise.all([draw_recent_piechart(),listtop10(),get_recent_dataset()]).then(function(value){
+    log.info("getRecentUsage finished")
+  });
+}
+
+//Draw Recent Usage chart
+var draw_recent_piechart = function drawRecentPieChart(){
+  return new Promise(function(resolve, reject){
+      setTimeout( function(){
+        log.info("pie10 draw start");
+        Promise.all([top10_day(),totaltimeday()]).then(function(value){
+          log.info("pie10 draw start");
+          var recent_labels = [];
+          var recent_datasets = [];
+          var except = 0;
+          value[0].forEach((row) => {
+            recent_labels.push(row.name);
+            recent_datasets.push(row.totaltime);
+            except += row.totaltime;
+          });
+          recent_labels.push("그 외");
+          recent_datasets.push(value[1]-except);
+          var ctxP = document.getElementById("pieChart10").getContext('2d');
+          var myPieChart10 = new Chart(ctxP, {
+            type: 'pie',
+            data: {
+                labels: recent_labels,
+                datasets: [{
+                data: recent_datasets,
+                backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#9B59B6", "#2471A3", "#3498DB", "#F39C12","#16A085","#E91E63","#949FB1", "#4D5360"],
+                hoverBackgroundColor: ["#FF5A5E", "#5AD3D1", "#FFC870", "#AF7AC5 ", "#2980B9","#5DADE2", "#F5B041","#45B39D","#EC407A","#A8B3C5", "#616774"]
+                }]
+            },
+            options: {
+                responsive: false
+            }
+          });
+          log.info("pie10 chart draw draw draw")
+        });
+        resolve(true);
+      }, 1000)
+  })
+}
+
+//Get top 10 App for recentusage
+var listtop10 = function listTop10(){
+  return new Promise(function(resolve, reject){
+      setTimeout( function(){
+        log.info("listtop10 draw start");
+        Promise.all([top10_day()]).then(function(value){
+          log.info("listtop10 draw start");
+          var html = `<a class="border-bottom border-gray pb-2 mb-0 font-nanum">사용 시간 Top10</a><br>`;
+          var index = 1;
+          value[0].forEach((row) => {
+            html += `<div class="pl-1 pt-1"><a class="pb-1" style="font-size: 15px">${index}. ${row.name}</a><br></div>`;
+            index++;
+          });
+          document.querySelector('#top10list').innerHTML = html;
+          log.info("listtop10 chart draw draw draw")
+        });
+        resolve(true);
+      }, 1000)
+  })
+}
+
+//Change byte to gb, mb, kb
 var getbyte = function getB(byte){
   return new Promise(resolve => 
     setTimeout(() => {
@@ -409,6 +403,7 @@ var getbyte = function getB(byte){
   );
 }
 
+//Get total usage time of the device
 var alltime = function getAllTime(){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
@@ -432,6 +427,7 @@ var alltime = function getAllTime(){
     })
 }
 
+//Get total usage time of specific app
 var totaltime = function getTotaltime(packagename){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
@@ -457,6 +453,7 @@ var totaltime = function getTotaltime(packagename){
     })
 }
 
+//Get total usage time of recent 10 days
 var totaltimeday = function getTotaltimeDay(){
   return new Promise(function(resolve, reject){
       setTimeout( function(){
@@ -480,6 +477,7 @@ var totaltimeday = function getTotaltimeDay(){
   })
 }
 
+//Get package detail of specific packagename
 var packagedetail = function getPackageDetail(packagename){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
@@ -506,6 +504,7 @@ var packagedetail = function getPackageDetail(packagename){
     })
 }
 
+//Get lastusedtime for packagename
 var usedtime = function getLasttimeused(packagename){
     return new Promise(function(resolve, reject){
         setTimeout( function(){
@@ -543,6 +542,7 @@ var usedtime = function getLasttimeused(packagename){
     })
 }
 
+//Get top 10 apps by usagetime
 var top10_day = function getTop10(){
   return new Promise(function(resolve, reject){
       setTimeout( function(){
@@ -569,6 +569,8 @@ var top10_day = function getTop10(){
       }, 1000)
   })
 }
+
+//Get used app for specific day
 function getdayusedapp(day){
   var date = (day > 9)? day : "0"+day;
   const db = new sqlite3.Database('InnerDatabase.db');
@@ -605,6 +607,8 @@ function getdayusedapp(day){
   }
   document.getElementById('day_'+day).style.fontWeight = "bold";
 }
+
+//Draw recent 10days usage barchart
 var get_recent_dataset = function getRecentDataset(){
   return new Promise(function(resolve, reject){
     setTimeout( function(){
@@ -662,47 +666,3 @@ var get_recent_dataset = function getRecentDataset(){
     }, 1000)
   })
 }
-
-//   var ctxP = document.getElementById("pieChart").getContext('2d');
-//         var myPieChart = new Chart(ctxP, {
-//         type: 'pie',
-//         data: {
-//             labels: ["Red", "Green", "Yellow", 보라  "Grey", "Dark Grey"],
-//             datasets: [{
-//             data: [300, 50, 100, 40, 120],
-//             backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360"],
-//             hoverBackgroundColor: ["#FF5A5E", "#5AD3D1", "#FFC870", "#A8B3C5", "#616774"]
-//             }]
-//         },
-//         options: {
-//             responsive: true
-//         }
-//         });
-//         db.close();
-
-
-// var options_main_stacked={
-// 	type: 'bar',
-// 	data: {
-// 		labels: label_text,
-// 		datasets:[{
-// 			label:label_data1_text,
-// 			data:label_data1,
-// 			backgroundColor:'rgba(255, 127, 80, 1)',
-// 			borderColor:'rgba(255, 127, 80, 1)',
-//             type:"line",
-//             fill: false
-// 		},
-// 		{
-// 			label:label_data2_text,
-// 			data:label_data2,
-// 			backgroundColor:'rgba(255, 206, 86, 0.2)',
-// 		},
-// 		{
-// 			label:label_data3_text,
-// 			data:label_data3,
-// 			backgroundColor:'rgba(75, 192, 192, 0.2)',
-// 		}]
-// 	},
-//    	options: options_stacked
-// };
