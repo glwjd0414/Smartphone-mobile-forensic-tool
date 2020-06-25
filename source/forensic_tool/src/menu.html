@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/menu.css">
+    <title>Document</title>
+</head>
+<body>
+<div id="div_root">
+    <div id="div_top" onclick="location.href='data.html'">
+        <h1>F-out</h1>
+        <h2 style="color:#4e73df; font-size:40px;">menu</h2>
+    </div>
+    <div id="div_con0">
+        <div id ="menu" class="menu_30">
+            <div id="btn_group">
+                <button id="btn" class="menu_alldata_nwide" onclick="menu_all();">All Data
+                    <div id="menu_alldata_wide" style="display:none" onclick="location.href='alldata_menu.html'">
+                        <br>
+                        <h2>전체 데이터 보기</h2>
+                        <svg class="bi bi-arrow-right-circle" width="0.3em" height="0.3em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="color:#4e73df">
+                          <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                          <path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
+                          <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                    </div>
+                </button>
+            </div> 
+        </div>
+        <div id ="menu" class="menu_70">
+            <div id="btn_group">
+                <button id="btn" class="menu_analysis_nwide" onclick="menu_analysis();">Data Analysis</button>
+            </div> 
+        </div>   
+    </div>
+    <div id="div_con1" style="display:none">
+        <div id ="menu" class="menu_up">
+            <div id="btn_group">
+                <button id="btn" class="menu_analysis_menu1_nwide" onclick="menu_analysis_menu1();">CallLog
+                    <div id="menu_analysis_menu1_wide" style="display:none" onclick="location.href='menu1.html'">
+                        <h4>연락처, 통화, 문자 기록을 분석하여<br>사용자의 연락 패턴 분석</h4>
+                        <div id="wide_location">
+                            <h2>연락처 분석</h2>
+                            <svg class="bi bi-arrow-right-circle" width="0.3em" height="0.3em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="color:#4e73df">
+                              <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                              <path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
+                              <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </button>
+            </div> 
+        </div>
+        <div id ="menu" class="menu_up">
+            <div id="btn_group">
+                <button id="btn" class="menu_analysis_menu2_nwide" onclick="menu_analysis_menu2();">SMS
+                    <div id="menu_analysis_menu2_wide" style="display:none" onclick="location.href='menu2.html'">
+                        <h4>문자 키워드 분석<br>결제문자 분석</h4>
+                        <div id="wide_location">
+                            <h2>문자 키워드 분석</h2>
+                            <svg class="bi bi-arrow-right-circle" width="0.3em" height="0.3em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="color:#4e73df">
+                              <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                              <path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
+                              <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </button>
+            </div> 
+        </div>   
+        <div id ="menu" class="menu_up">
+            <div id="btn_group">
+                <button id="btn" class="menu_analysis_menu3_nwide" onclick="menu_analysis_menu3();">Apps
+                    <div id="menu_analysis_menu3_wide" style="display:none" onclick="location.href='menu_apps.html'">
+                        <h4>어플리케이션 사용 분석</h4>
+                        <div id="wide_location">
+                            <h2>어플 사용 분석</h2>
+                            <svg class="bi bi-arrow-right-circle" width="0.3em" height="0.3em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="color:#4e73df">
+                              <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                              <path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
+                              <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </button>
+            </div> 
+        </div> 
+        <div id ="menu">
+            <div id="btn_group">
+                <button id="btn" class="menu_analysis_menu4_nwide" onclick="menu_analysis_menu4();">Media
+                    <div id="menu_analysis_menu4_wide" style="display:none" onclick="location.href='menu_media.html'">
+                        <h4>미디어 파일 저장공간 분석<br>비디오 분석</h4>
+                        <div id="wide_location">
+                            <h2>미디어 분석</h2>
+                            <svg class="bi bi-arrow-right-circle" width="0.3em" height="0.3em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="color:#4e73df">
+                              <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                              <path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
+                              <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </button>
+            </div> 
+        </div> 
+        <div id ="menu">
+            <div id="btn_group">
+                <button id="btn" class="menu_analysis_menu5_nwide" onclick="menu_analysis_menu5();">Photo
+                    <div id="menu_analysis_menu5_wide" style="display:none" onclick="location.href='photo_classification/photo_main.html'">
+                        <h4>사진 분류 및 분석</h4>
+                        <div id="wide_location">
+                            <h2>사진 분석</h2>
+                            <svg class="bi bi-arrow-right-circle" width="0.3em" height="0.3em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="color:#4e73df">
+                              <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                              <path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
+                              <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </button>
+            </div> 
+        </div>
+        <div id ="menu">
+            <div id="btn_group">
+                <button id="btn" class="menu_analysis_menu6_nwide" onclick="menu_analysis_menu6();">Timeline
+                    <div id="menu_analysis_menu6_wide" style="display:none" onclick="location.href='timeline.html'">
+                        <h4>시간 데이터를 이용한 timeline 생성</h4>
+                        <div id="wide_location">
+                            <h2>타임라인 분석</h2>
+                            <svg class="bi bi-arrow-right-circle" width="0.3em" height="0.3em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="color:#4e73df">
+                              <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                              <path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
+                              <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </button>
+            </div> 
+        </div>    
+    </div>
+        
+    </div>
+</div>
+    <script src="menu.js"></script>
+</body>
+</html>

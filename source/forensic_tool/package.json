@@ -1,0 +1,31 @@
+{
+  "name": "forensic_tool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "rebuild": "electron-rebuild -f -w sqlite3"
+  },
+  "author": "Hee <glwjd0414@khu.ac.kr>",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^8.2.0",
+    "electron-rebuild": "^1.11.0"
+  },
+  "dependencies": {
+    "@google-cloud/vision": "^2.0.0",
+    "bootstrap-icons": "^1.0.0-alpha4",
+    "chart.js": "^2.9.3",
+    "@google-cloud/video-intelligence": "^3.0.0",
+    "appium-adb": "^7.27.1",
+    "electron-log": "^4.2.0",
+    "jQuery": "^1.7.4",
+    "mysql": "^2.18.1",
+    "node-adb": "^0.1.6",
+    "python-shell": "^2.0.0",
+    "rimraf": "^3.0.2",
+    "socket.io": "^2.3.0",
+    "sqlite3": "^4.2.0"
+  }
+}

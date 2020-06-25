@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <link rel="stylesheet" href="../assets/css/menu_apps.css">
+    <title>Document</title>
+</head>
+<body>
+<div class="container">
+    <header class="menu-header py-4">
+        <div class="row d-flex justify-content-start flex-nowrap align-items-end">
+          <div class="col">
+            <a class="title-name text-dark">Apps</a>
+          </div>
+          <div div class="col-9">
+            <a class="title-detail">앱 사용 정보 분석</a>
+          </div>
+          <div div class="col">
+            <a class="title-back" href="menu.html" id="menu-info">뒤로가기</a>
+          </div>
+        </div>
+    </header>
+    <div class="nav-scroller nav-color py-1 mb-2">
+      <nav class="nav d-flex justify-content-around">
+        <a class="p-2" href="#" style="color: whitesmoke" onclick="openTap('App-List');">App List</a>
+        <a class="p-2" href="#" style="color: whitesmoke" onclick="openTap('Deleted-App');">Deleted App</a>
+        <a class="p-2" href="#" style="color: whitesmoke" onclick="openTap('Recent-Usage');">Recent Usage</a>
+      </nav>
+    </div>
+    <div class="container">
+      <div id="App-List" class="menu">
+        <div class="row">
+          <div class="col">
+            <div class="my-3 p-3  bg-white rounded shadow-sm">
+              <h6 class="border-bottom border-gray pb-2 mb-0 font-nanum">App List</h6>
+              <div class="row sort justify-content-end">
+                <a id="wifiusage" class="sort p-2 text-muted" href="#" onclick="getAppInfoList('wifiusage');">wifi 사용량순</a>
+                <a id="cellularusage" class="sort p-2 text-muted" href="#" onclick="getAppInfoList('cellularusage');">cellular 사용량순</a>
+                <a id="totaltime" class="sort p-2 text-muted" href="#" onclick="getAppInfoList('totaltime');" style="font-weight: bold;">실행 시간순</a>
+              </div>
+              <div id="applist">
+
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="my-3 p-3  bg-white rounded shadow-sm">
+              <a id="appdetail_title" class="border-bottom border-gray pb-2 mb-0 font-nanum">App Detail</a>
+              <div id="appdetails" class="detail_app font-nanum pt-2 pb-5">
+                <h8 class="pt-3 pb-3 mb-0 font-italic">세부사항을 확인하려면 follow를 클릭하세요</h8>
+              </div>
+              <div id="pieChartdiv" class="pb-5">
+                <canvas id="pieChart" style="max-width: 500px;"></canvas>
+              </div>
+              <div id="barchart_title" style="display: none;">
+                <a class="pb-2 mb-0 font-nanum border-bottom border-gray">사용 시간대</a>
+              </div>
+              <div id="barChartdiv" class="pb-5">
+                <canvas id="barChart"></canvas>
+              </div>
+              <div id = "apptimelist" class="font-nanum">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div id="Deleted-App" class="menu" style="display:none">
+        <div class="row">
+          <div class="col">
+            <div id="deletedapps" class="my-3 p-3  bg-white rounded shadow-sm">
+              <h6 class="border-bottom border-gray pb-2 mb-0">Deleted Apps</h6>
+              <div class="overflow-auto">
+                <div id="deletedapplist" class="font-nanum">
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div id="Recent-Usage" class="menu" style="display:none">
+        <h6 class="border-bottom border-gray pb-2 mb-0">최근 10일 사용 분석</h6>
+        <div class="row">
+          <div class="col">
+            <div id="day10analysis" class="my-3 p-3  bg-white rounded shadow-sm">
+              <div id="pieCharttop10">
+                <a class="border-bottom border-gray pb-2 mb-0 font-nanum">사용 시간 비율</a>
+                <canvas id="pieChart10" width="350" height="350"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div id="top10list" class="my-3 p-3  bg-white rounded shadow-sm">
+
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="my-3 p-3  bg-white rounded shadow-sm">
+              <a class="border-bottom border-gray pb-2 mb-0 font-nanum">일별 사용량</a>
+              <canvas id="recent_bar" width="400" height="400"></canvas>
+            </div>
+          </div>
+          <div class="col">
+            <div class="my-3 p-3  bg-white rounded shadow-sm">
+              <a class="border-bottom border-gray pb-2 mb-0 font-nanum">사용 어플</a>
+              <div id="selectday"class="row sort justify-content-end">
+                
+              </div>
+              <table id="day_use_list" class="font-nanum" style="font-size: 10;">
+                  <tbody>
+                      
+                  </tbody>
+              </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+    <script src="menu_apps.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</body>
+</html>

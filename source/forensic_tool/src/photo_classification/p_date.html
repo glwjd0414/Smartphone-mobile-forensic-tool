@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<sc>, initial-scale=1.0">
+    <link rel="Stylesheet" href="../../assets/css/p_date.css">
+    <title>Photo classification by date</title>
+</head>
+<body>
+    <div class="content">
+        <div class="win_top">
+            <div id="title">
+                <img src="../../assets/img/photo_date.png"  onclick="history.go(-1)" class="float_left" title="Back to photo menu">
+            </div>
+            <div id="date">
+                <p class="float_left"><button id="select">Select date</button></p>
+                <p class="float_left"><button id="save_photo">Save photo</button></p>
+                <p class="float_left" id="selected-date"></p>
+                <p class="float_left" id="selected-file"></p>
+            </div>      
+        </div>
+
+        <div class="results" id="r">
+            <h1 style="margin-top:300px; color:dimgray">날짜를 선택해 해당 기간동안의 사진을 확인하세요</h1>
+        </div>
+    </div>
+    
+
+    
+    <script type="text/javascript">
+        const { ipcRenderer } = require("electron");
+        const { BrowserWindow } = require("electron").remote;
+        var exec = require('child_process').exec, child;
+
+        const btn = document.getElementById("select");
+        const saveBtn = document.getElementById("save_photo");
+
+        btn.addEventListener("click", () => {
+            win = new BrowserWindow({
+                width: 630,
+                height: 100,
+                frame: false,
+                alwaysOnTop: true,
+                webPreferences: {
+                nodeIntegration: true
+                }
+            });
+
+            //win.webContents.openDevTools();
+            win.on("close", () => {
+                win = null;
+            });
+            win.loadFile("./src/photo_classification/select_date.html");
+            win.show();
+            
+        });
+
+        saveBtn.addEventListener("click", () =>{
+            var checkbox = document.getElementsByName('save');
+            ipcRenderer.send('open-file-dialog');
+        })
+
+        ipcRenderer.on('selected-directory', (event, path) => {
+            var parent_dir = new String();
+            var num = __dirname.indexOf("src");
+            parent_dir = __dirname.substring(0, num);
+            if(!path.canceled){
+                var checkbox = document.getElementsByName('save');
+                checkbox.forEach(element => {
+                    if(element.checked){
+                        var loc = element.value.indexOf("photos");
+                        var imgpath = new String();
+                        imgpath = parent_dir+element.value.substring(loc).replace(/\//g,'\\').replace(/#%&!/g, " "); //공백 대체 문자를 다시 공백으로
+                        var command = 'copy "'+imgpath+'" '+path.filePaths[0];
+                        
+                        exec(command, (error, stdout, stderr)=>{
+                            if(!error){
+                                document.getElementById('selected-file').innerHTML = "saved!";
+                            }
+                        });
+                    }    
+                })  
+            }
+             
+        })
+
+        let result;
+
+        ipcRenderer.on("select_result", (e, arg) => {
+            result = arg.result;
+            document.getElementById('selected-date').innerHTML = arg.start + " - " +arg.end;
+            print_photo();
+        });
+
+        function print_photo(){
+        const results = document.getElementById('r');
+        var myHTML = '';
+        for(var i = 0; i< result.length; i++){
+            var path = new String();
+            path = result[i].path;
+            var num = path.indexOf("DCIM");
+            var folder_path = new String();
+            var time = new Date(Number(result[i].date_added)*1000);
+            var month = time.getMonth()+1;
+            folder_path = "../../photos/"+ path.substring(num);
+            myHTML += '<div class="photo"><div class="top"><img id="p" src="'+folder_path
+                +'"></div><div class="bottom"><div class="name"><p id="d">['+month+'/'+time.getDate()+']</p><p id="n">'+result[i].display_name+'</p></div>';
+            var replacement = folder_path.replace(/ /g, "#%&!"); //html value 공백 문제, 공백 대체 문자로 replace
+            myHTML +="<div class='check'><input type='checkbox' name='save' value="+replacement+"></div></div></div>"
+        }
+        results.innerHTML = myHTML;
+        saveBtn.style.visibility = "visible";
+        };
+    </script>
+</body>
+</html>

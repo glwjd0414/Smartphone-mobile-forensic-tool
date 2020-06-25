@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="Stylesheet" media="all" type="text/css" href="bower_components/jquery-mobile-bower/css/jquery.mobile-1.4.5.css" />
+    <link rel="Stylesheet" href="../assets/css/data.css">
+    <style type="text/css" media="all">
+    .content{
+        height:280px;
+    }
+    body { cursor: default; }
+    </style>
+</head>
+<body>
+    <div data-role="page" class="all">
+        <div data-role="main" class="ui-content" id="btn_group">
+            <button id="connect_btn">Connect device</button>
+        </div>
+        <div class="content">
+            <h1 id="cc">Connect your Device</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <div class="side">
+            </div>
+            <div class='center'>
+                <button id="next_btn" onclick="location.href='menu.html'">Next</button>
+            </div>
+            <div class="side">
+                <img src="../assets/img/data.png">
+            </div>
+        </div>
+    </div>
+    <script src="data.js"></script>
+</body>
+</html>

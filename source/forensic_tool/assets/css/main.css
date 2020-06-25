@@ -1,0 +1,40 @@
+h1 {
+    font-size:6em;
+    text-align: center;
+    font-family : "Born Ready Slanted"
+}  
+#content1{
+    text-align: center;
+    font-size:0.8em;
+}
+#content2{
+    text-align: center;
+    font-size:2em;
+}
+#start_btn{ 
+    border-radius: 5px; 
+    font-size: 30px;
+    margin-left: 20px;
+    margin-right : 20px;
+} 
+#btn_group button{ 
+    border: 1px solid #4e73df; 
+    background-color: rgba(0,0,0,0); 
+    color: white; 
+    background-color: #4e73df;
+    padding: 5px; 
+    display: table;
+    margin-left: auto; 
+    margin-right: auto;
+    margin-top: 60px;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+#btn_group button:hover{
+    color:#4e73df; 
+    background-color: white;
+}
+.centered { 
+    display: table; margin-left: auto; 
+    margin-right: auto;
+}

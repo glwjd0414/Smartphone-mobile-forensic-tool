@@ -1,0 +1,68 @@
+h1 {
+    font-size:4.5em;
+    text-align: center;
+    font-family : "Born Ready Slanted";
+}  
+#connect_btn{ 
+    font-size: 30px;
+    height:50px;
+    margin-top: 80px;
+}
+#next_btn{ 
+    font-size: 30px;
+    height:50px;
+    margin-top: 80px;
+}
+#btn_group button{ 
+    border: 1px solid #4e73df; 
+    background-color: rgba(0,0,0,0); 
+    color: white; 
+    background-color: #4e73df;
+    padding: 5px; 
+    display: table;
+    margin-left: auto; 
+    margin-right: auto;
+    padding-left: 100px;
+    padding-right: 100px;
+}
+#btn_group button:hover{
+    color:#4e73df; 
+    background-color: white;
+}
+.all{
+    display:flex;
+    height : 95vh;
+    flex-direction:column;
+}
+.content{
+    flex:2;
+}
+.ui-content{
+    flex:2;
+    display:flex;
+}
+.center{
+    float:left;
+    width:40%;
+    text-align: center;
+}
+.side{
+    float:left;
+    width:30%;
+}
+.center button{ 
+    border: 1px solid #4e73df; 
+    background-color: rgba(0,0,0,0); 
+    color: white; 
+    background-color: #4e73df;
+    padding: 5px; 
+    display: table;
+    margin-left: auto; 
+    margin-right: auto;
+    padding-left: 100px;
+    padding-right: 100px;
+}
+.center button:hover{
+    color:#4e73df; 
+    background-color: white;
+}

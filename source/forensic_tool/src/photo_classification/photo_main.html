@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<sc>, initial-scale=1.0">
+    <link rel="Stylesheet" href="../../assets/css/photo_main.css">
+    <title>Photo</title>
+</head>
+<body>
+    <div class="div_root">
+        <div class="div_top">
+            <img src="../../assets/img/Photo.png" onclick="history.go(-1)" title="Back to main menu">
+        </div>
+        <div class="div_content">
+            <div class="div_con_block">
+                <img src="../../assets/img/photo_date.png" onclick="location.href='p_date.html'" title="날짜로 사진 분류">                   
+            </div>
+            <div class="div_con_block">
+                 <img src="../../assets/img/photo_loc.png" onclick="location.href='p_loc.html'" title="위치로 사진 분류">
+            </div>
+            <div class="div_con_block">
+                <img src="../../assets/img/analysis.png" onclick="location.href='p_ml.html'" title="사진 분석(이미지 키워드 추출)">
+            </div>
+            <div class="div_con_block">
+                <img src="../../assets/img/Detect unsafe Image.png" onclick="location.href='p_detect.html'" title="유해한 이미지 감지">
+            </div>
+        </div>
+    </div>
+    <script src="photo_main.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <link rel="stylesheet" href="../assets/css/menu_apps.css">
+    <title>Document</title>
+</head>
+<body>
+<div class="container">
+    <header class="menu-header py-4">
+      <div class="row d-flex justify-content-start flex-nowrap align-items-end">
+        <div class="col">
+          <a class="title-name text-dark">Media</a>
+        </div>
+        <div div class="col-9">
+          <a class="title-detail">미디어 파일 분석</a>
+        </div>
+        <div div class="col">
+          <a class="title-back" href="menu.html" id="menu-info">나가기</a>
+        </div>
+      </div>
+  </header>
+  <div class="nav-scroller nav-color py-1 mb-2">
+    <nav class="nav d-flex justify-content-around">
+      <a class="p-2" href="#" style="color: whitesmoke" onclick="openTap('Media-Strorage-Structure');">Media Strorage Structure</a>
+      <a class="p-2" href="#" style="color: whitesmoke" onclick="openTap('Video-Analysis');">Video Analysis</a>
+    </nav>
+  </div>
+    <div class="container">
+      <div id="Media-Strorage-Structure" class="menu">
+        <div class="row">
+          <div class="col">
+            <div class="my-3 p-3  bg-white rounded shadow-sm">
+              <h6 class="border-bottom border-gray pb-2 mb-0">Media file 저장공간</h6>
+              <div id="barChartdiv">
+                  <canvas id="pieChart"></canvas>
+              </div>
+              <div id="pie_datalist" class="w-75 pt-4">
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="my-3 p-3  bg-white rounded shadow-sm">
+              <h6 class="border-bottom border-gray pb-2 mb-0">파일 구조 분석</h6>
+              <div class="row justify-content-end">
+                <a id="photo" class="filetype p-2 text-muted" href="#" onclick="getStorageStructure('photo');" style="font-weight: bold;">Image</a>
+                <a id="video" class="filetype p-2 text-muted" href="#" onclick="getStorageStructure('video');">Video</a>
+                <a id="audio" class="filetype p-2 text-muted" href="#" onclick="getStorageStructure('audio');">Audio</a>
+                <a id="documentinfo" class="filetype p-2 text-muted" href="#" onclick="getStorageStructure('documentinfo');">Document</a>
+              </div>
+              <h8 id="struct_title" class="pt-3 pb-3 pl-1 mb-0 font-italic" style="font-size: 17px;">Image</h8>
+              <div id="mediafile_struct">
+                <div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="filelist_for_folder" class="row" style="display: none;">
+          <div class="col">
+            <div class="my-3 p-3  bg-white rounded shadow-sm">
+              <h6 id='infilelist' class="border-bottom border-gray pb-2 mb-0 "></h6>
+                <table id="filetable" class="table">
+                  <tbody>
+                      
+                  </tbody>
+                </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="Video-Analysis" class="menu" style="display: none;">
+        <div class="row">
+          <div class="col">
+            <div class="my-3 p-3  bg-white rounded shadow-sm">
+              <h6 class="border-bottom border-gray pb-2 mb-0">Video 선택</h6>
+                <div class="check_confirm d-flex justify-content-end p-1">
+                  <button id="temp_post" type="button" class="btn btn-sm btn-primary font-nanum">analysis start</button>
+                </div>
+                <table id="videotable" class="table">
+                  <tbody>
+                      
+                  </tbody>
+                </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="Analysis-Detail" class="menu" style="display: none;">
+        <div id ="va_list" class="bg-white rounded shadow-sm">
+
+        </div>
+      </div>
+    </div>
+</div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="menu_media.js"></script>
+  </body>
+</html>

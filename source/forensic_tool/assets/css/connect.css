@@ -1,0 +1,47 @@
+#connect_btn{ 
+    font-size: 30px;
+    margin-left: 20px;
+    margin-right : 20px;
+}
+#closeBtn {
+    font-size: 20px;
+    margin-left: 20px;
+    margin-right : 20px;
+} 
+.container{
+    border-radius: 2px;
+    background-color: rgba(0,0,0,0); 
+    color : black;
+    visibility: hidden;
+    height:170px;
+    width : 460px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top :10px;
+    display: table;
+}
+.container button{
+    border: 2px solid #4e73df;
+    border-radius: 2px;
+    background-color: rgba(0,0,0,0); 
+    width : 450px;
+    height : 50px;
+    line-height: 50px;
+    visibility: hidden;
+    vertical-align: middle;
+    font-size: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
+.container button:hover{
+    color:white; 
+    background-color: #4e73df;
+}
+
+#status{
+    visibility: hidden;
+    height: 10px;
+    text-align: center;
+}

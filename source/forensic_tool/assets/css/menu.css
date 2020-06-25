@@ -1,0 +1,109 @@
+
+
+#div_root{
+    margin:auto;
+    width:100%;
+}
+#div_top{
+    width:100%;
+    height:80px;
+    vertical-align: baseline;
+}
+#div_con1{ 
+    width:100%;
+    height:600px;
+    float:left;
+}
+#div_con2{ 
+  background-color:beige;
+  width:29%;
+  height:825px;
+  float:left;
+  text-align : left;
+}
+#menu{
+  width:30%;
+  height:200px;
+  margin-left: 2%;
+  margin-top:25px;
+  margin-bottom:0px;
+  float:left;
+}
+.menu_up{
+	margin-top:0px !important;
+}
+.menu_70{
+	width:50% !important;
+	height:140px !important;
+}
+.menu_30{
+	height:140px !important;
+}
+#div_bottom{
+    width:100%;
+    height :20px;
+    clear:both;
+}
+h1 {
+  font-size: 80px;
+  font-weight: normal;
+  font-family:"Born Ready Slanted";
+  display:inline;
+}
+h2 {
+    font-size: 40px;
+    font-weight: normal;
+	font-family:"Born Ready Slanted", "제주고딕";
+  	display:inline;
+  	margin-left:25px;
+  	color:#858796;
+}
+h4{
+    font-size: 13px;
+    color:#5a5c69 !important;
+    font-weight:normal;
+    text-align:center;
+    margin:0px;
+    margin-top:10px !important;
+}
+#btn h2{
+	font-size:20px !important;
+	font-family:"Born Ready Slanted", "제주고딕";
+	margin-left:0px;
+}
+#btn{ 
+  border-radius: 5px; 
+  font-size: 46px;
+  margin-left: auto;
+  margin-right : auto;
+  font-family:"Born Ready Slanted";
+  display:block;
+} 
+#btn_group button{ 
+  border: 1px hidden black; 
+  background-color: rgba(0,0,0,0); 
+  color:#5a5c69;
+  padding: 50px; 
+  display: table;
+  margin-left: auto; 
+  margin-right: auto;
+  margin-top: 0px;
+}
+#btn_group button:hover{ 
+  color:white; 
+  background-color: skyblue;
+}
+#btn_another button{ 
+  border: 1px hidden black; 
+  background-color: skyblue; 
+  color: white; 
+  padding: 50px; 
+  display: table;
+  margin-left: auto; 
+  margin-right: auto;
+  margin-top: 10%;
+}
+#btn_another button:hover{ 
+  color:black; 
+  background-color: rgba(0,0,0,0);
+}
