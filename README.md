@@ -44,7 +44,7 @@
 
 <br><br>
 ### forensic tool 실행 방법
-> electron desktop ap 실행을 위한 환경 설정은 [링크](https://www.electronjs.org/docs/tutorial/development-environment#setting-up-windows, "electron") 참조   <br>
+> electron desktop ap 실행을 위한 환경 설정은 [링크](https://www.electronjs.org/docs/tutorial/development-environment#setting-up-windows "electron") 참조   <br>
 > ```
 > $ npm install
 > $ npm run rebuild
@@ -112,13 +112,13 @@
 >   * 환경 설정   <br>
 > 'google cloud platform' project 생성 및 결제 사용 설정   <br>
 >  API library 에서 Cloud Vision API api 사용 설정   <br>
-> 상세 설정은 [링크](https://cloud.google.com/vision/docs/setup, "google vision api") 참조   <br>
+> 상세 설정은 [링크](https://cloud.google.com/vision/docs/setup "google vision api") 참조   <br>
 > * 유해 콘텐츠 감지   <br>
 > 유해 콘텐츠 감지는 Google vision api의 학습된 모델을 이용해 사용자의 모든 사진의 유해성을 판단하는데 다섯가지 카테고리 (adult, spoof, medical, violence, racy)의 가능성(unknown, very_unlikely, unlikely, possible, likely, very_likely)이 반환된다. adult, racy를 유해성 판단 기준으로 설정하고, 반환되는 가능성에  따라 각 항목에 점수를 부여했다. 두 항목의 평균이 60점 이상(possible 이상)으로 유해 콘텐츠라고 판단됐을 때 경고 메시지와 함께 블러 처리한 유해 이미지를 보여준다.<br>
 >   * 환경 설정   <br>
 > 'google cloud platform' project 생성 및 결제 사용 설정   <br>
 >  API library 에서 Cloud Vision API api 사용 설정   <br>
-> 상세 설정은 [링크](https://cloud.google.com/vision/docs/setup, "google vision api") 참조   <br><br>
+> 상세 설정은 [링크](https://cloud.google.com/vision/docs/setup "google vision api") 참조   <br><br>
 
 > **6. 사용자 하루 타임라인**<br>
 > 스마트 폰에서 추출한 데이터 중 시간 데이터를 가지고 있는 데이터를 이용해 사용자의 하루 타임라인을 생성하는 기능이다. 시간 데이터가 존재하는 통화목록, 문자, 일정, 사진, 앱 사용량 데이터를 사용했다. 선택한 날짜의 데이터를 모두 가져와 하나의 리스트로 만들고 이를 시간 순서대로 정렬 후 사용한 시각과 함께 데이터 유형 별로 형태를 구분해 하나의 타임라인을 생성한다. 통화목록 데이터는 통화 유형과, 발신/수신인 이름 또는 번호, 통화 시간, 문자 데이터는 문자 유형, 발신/수신인 이름 또는 번호, 문자 내용, 일정 데이터는 일정 이름, 위치, 설명이 출력된다. 사진 데이터는 해당 사진과 이름이 출력되고, 앱 사용량 데이터는 해당 앱의 이름, 사용 시간, 앱 아이콘이 출력된다. <br>
