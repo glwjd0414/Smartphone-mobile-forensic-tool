@@ -29,15 +29,6 @@ connect_btn.addEventListener("click", () => {
     win.show();
     
 });
-/*
-var connection = mysql.createConnection({
-  host:'localhost',
-  user: 'root',
-  password: '1234'
-});
-
-connection.connect();
-*/
 
 var mysql = {
 	user: 'root',
@@ -51,7 +42,7 @@ function apkInstall(){
 			cc.innerHTML="start app";
 		})
 	});
-	//cmd_install();
+	cmd_install();
 }
 
 function convertToMysql(){
@@ -77,60 +68,6 @@ function convertToMysql(){
 	})
 }
 
-// function extractDB () {
-// 	cmd_backup = exec('adb -s '+device+' backup com.example.dataextraction -f backup.dataextraction.ad', function(error, stdout, stderr){
-// 		cc.innerHTML="backup app";
-// 		setTimeout(function(){
-// 			cmd_unpack = exec('java -jar abe.jar unpack backup.dataextraction.ad dataextraction.tar',function(error, stdout, stderr){
-// 				cc.innerHTML="unpack backup";
-// 				cmd_unzip = exec('tar xvf dataextraction.tar', function(error, stdout, stderr){
-// 					cc.innerHTML="unzip tar";
-// 					cmd_moveIdb = fs.rename('apps/com.example.dataextraction/db/InnerDatabase.db', 'InnerDatabase.db', function(){
-// 						cc.innerHTML="move InnerDB File";
-//             			cmd_moveNdb = fs.rename('apps/com.example.dataextraction/db/networkDatabase.db', 'networkDatabase.db',function(){
-//             				cc.innerHTML="move NetworkDB File";
-//             				cmd_sqlIdb = exec('sqlite3 InnerDatabase.db .dump | python SQLiteToMysql.py > InnerDatabase.sql',function(error, stdout, stderr){
-//             					cc.innerHTML="make InnerDB SQL";
-//                 				cmd_sqlNdb = exec('sqlite3 networkDatabase.db .dump | python SQLiteToMysql_network.py > networkDatabase.sql', function(error, stdout, stderr){
-//                   					cc.innerHTML="make NetworkDB SQL";
-// 									cmd_makeIdb = exec('mysql -u'+mysql.user+' -p'+mysql.password+' -e "DROP DATABASE IF EXISTS DATAEXTRACTION;CREATE DATABASE DATAEXTRACTION CHARACTER SET utf8 COLLATE utf8_unicode_ci;USE DATAEXTRACTION;"',function(error, stdout, stderr){
-//     									cc.innerHTML="create InnerDB";
-//     									cmd_insertIdb = exec('mysql -u'+mysql.user+' -p'+mysql.password+' DATAEXTRACTION < InnerDatabase.sql',function(error, stdout, stderr){
-//       										cc.innerHTML="insert Data ; InnerDB";
-//       										cmd_makeNdb = exec('mysql -u'+mysql.user+' -p'+mysql.password+' -e "DROP DATABASE IF EXISTS DATAEXTRACTION_network;CREATE DATABASE DATAEXTRACTION_network;USE DATAEXTRACTION_network;"',function(error, stdout, stderr){
-//     											cc.innerHTML="create NetworkDB";
-//     											cmd_insertNdb = exec('mysql -u'+mysql.user+' -p'+mysql.password+' DATAEXTRACTION_network < networkDatabase.sql',function(error, stdout, stderr){
-//       												cc.innerHTML="insert Data ; NetworkDB";
-//       												cc.innerHTML="Data Extraction Complete !";
-//       												cc.innerHTML="Click 'NEXT' Button";
-//     											})
-//   											})
-//     									})
-//   									})
-//                 				})
-//               				})
-//             			})
-//           			})
-//         		})
-//       		})
-//     	},7000);
-//   	});
-//   	//cmd_backup();
-// }
-
-// //db insert done
-// io.on('connection', function(socket){
-// 	var instanceId = socket.id;
-
-// 	socket.on('alert', function(data){
-// 		cc.innerHTML = data.comment+" db created";
-// 	})
-// 	socket.on('end', function(data){
-// 		cc.innerHTML="all databases created !";
-// 		extractDB();
-//   	})
-// })
-
 function convertToMysql(){
 	cmd_sqlIdb = exec('sqlite3 InnerDatabase.db .dump | python SQLiteToMysql.py > InnerDatabase.sql',function(error, stdout, stderr){
     cc.innerHTML="make InnerDB SQL";
@@ -153,6 +90,7 @@ function convertToMysql(){
     })
   })
 }
+
 function extractDB () {
 	cmd_backup = exec('adb -s '+device+' backup com.example.dataextraction -f backup.dataextraction.ad', function(error, stdout, stderr){
 		cc.innerHTML="backup app";
@@ -172,7 +110,7 @@ function extractDB () {
 			})
 		},7000);
 	});
-  //cmd_backup();
+  cmd_backup();
 }
 
 //db insert done
@@ -195,7 +133,6 @@ ipcRenderer.on("device", (e, arg) => {
     //device.innerHTML = arg.toString();
 
     cc.innerHTML="DATA EXTRACTION START !";
-	// apkInstall();
-	extractDB();
+	apkInstall();
 
 });
