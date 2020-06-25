@@ -29,6 +29,7 @@ btn.addEventListener("click", ()=>{
         }
         else{
         list = results;
+        //이미지 라벨링 요청
         ipcRenderer.send('image_labels', list );
         }
 
@@ -39,10 +40,11 @@ btn.addEventListener("click", ()=>{
 var label_name = Array();
 var photo_list = Array();
 var label_result = Array();
-
+//라벨링 결과 획득 및 이미지 그룹화 시작
 ipcRenderer.on("labels_result", (e, result) => {
     var myHTML = '';
     label_result = result;
+    //print photo with labels
     result.forEach(element=>{
         myHTML +="<div class='photo'><div class='p_title'><p>"+element.name+"</p></div>"
         myHTML += '<div class="image"><img src="'+element.path+'"></div><div class ="labels">';
@@ -53,9 +55,9 @@ ipcRenderer.on("labels_result", (e, result) => {
         myHTML+='</div></div>';
     })
     content.innerHTML = myHTML;
-    make_chart();
+    sort_labellist();
 });
-
+//이미지 그룹화 
 function find_labellist(label, path){
   var idx = label_name.indexOf(label);
   if(idx == -1){
@@ -66,8 +68,8 @@ function find_labellist(label, path){
     photo_list[idx].push(path.toString());
   }
 }
-//라벨 그룹화
-function make_chart(){
+//라벨 리스트 정렬 (라벨 순위)
+function sort_labellist(){
   for(var i =0; i< photo_list.length; i++){
     for(var j = i+1; j <photo_list.length; j++){
         if(photo_list[j].length > photo_list[i].length){
@@ -88,7 +90,7 @@ function make_chart(){
   photo_list.forEach(element => {
       list_length.push(element.length);
   });
-
+  //차트 생성
   var mychart = new Chart(ctx,{
       type: 'horizontalBar',
       data :{
@@ -142,6 +144,7 @@ function make_chart(){
             }
           },
           onClick : function(e){
+            //라벨 차트에서 라벨 클릭 시 해장 라벨을 가진 사진 모두 출력
               var activePoints = mychart.getElementsAtEvent(e);
               var idx= activePoints[0]._index;
               var myHTML = '<div class="keyword"><h1>#'+label_name[idx]+'</h1></div><div class="k_content">';
@@ -165,6 +168,7 @@ function make_chart(){
       
   })
 }
+//print all photos with labels
 next.addEventListener("click", ()=>{
   var myHTML = '';
   label_result.forEach(element=>{

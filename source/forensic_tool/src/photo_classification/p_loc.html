@@ -39,13 +39,14 @@
     connection.connect();
     var list;
     function initMap() {
-         
+        //위치 데이터 존재하는 모든 사진 select
         connection.query('SELECT * FROM photo where latitude is not null', function(error, results, fields){
         if(error){
         }
         else{
             list = results;
              var first_p = {lat: Number(list[0].latitude), lng: Number(list[0].longitude)};
+             //첫 사진을 중심으로 맵 생성
             var map = new google.maps.Map(document.getElementById('map'), {
             zoom: 8,
             center: first_p
@@ -62,13 +63,16 @@
                 folder_path = "../../photos/" + path.substring(num);
                 var address = new String();
                 var geocoder = new google.maps.Geocoder;
+                //lattide, longitude로 주소 획득(변환)
                 geocoder.geocode({'location' : latlng}, function(results, status){
                     var marker = new google.maps.Marker({
                         position: latlng,
                         map: map,
                         title: element.display_name
                     });
+                    //마커 생성
                     if(status == 'OK'){
+                        //주소 획득 시 
                         if(results[0]){
                             address = results[0].formatted_address; 
                             var contentString = '<div id="content">'+
@@ -120,6 +124,7 @@
                             content: contentString,
                             maxWidth: 300
                         });
+                        //마커 클릭 시 사진 그룹화 함수 실행
                         marker.addListener('click', function() {
                             infowindow.open(map, marker);
                             p_group(element);
@@ -131,7 +136,7 @@
             }
         })    
     }
-
+    //사진 그룹화
     function p_group(photo){
         const main = document.getElementById('main');
         var path = new String();
@@ -143,10 +148,12 @@
         myHTML += '<div class="p"><img src="'+folder_path+'"></div>';
         list.forEach(element=>{
             if(element.title != photo.title){
+                //위도 경도 차이를 km단위로 변환
                 var hor = photo.latitude - Number(element.latitude);
                 hor *=111;
                 var ver = photo.longitude - Number(element.longitude);
                 ver *=88;
+                //선택된 사진 과의 거리 5km이내일 경우
                 if(((hor*hor) + (ver*ver))<=25){
                     main.innerHTML = "<p>Bye</p>"
                     var path2 = new String();
@@ -165,7 +172,7 @@
     }
       </script>   
 <script async defer 
-src="http://maps.google.com/maps/api/js?key=API_KEY&callback=initMap&sensor=true">
+src="http://maps.google.com/maps/api/js?key=API_KEY&callback=initMap&sensor=true">//API_KEY 생성한 API_KEY 입력
 </script>
 </body>
 </html>
