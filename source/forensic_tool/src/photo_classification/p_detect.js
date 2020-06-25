@@ -23,7 +23,7 @@ dd.addEventListener("click", ()=>{
     }
   });
 });
-
+//유해컨텐츠 감지 결과 받은 후 error 메시지 요청, 유해 컨텐츠 블러 처리 후 출력
 ipcRenderer.on('detect_result', (e, detect_result)=>{
     if(detect_result.length >0){
         r.style.border ="2px solid red";
@@ -38,7 +38,7 @@ ipcRenderer.on('detect_result', (e, detect_result)=>{
         r.innerHTML = "<h1 style='margin-top:300px; color:dimgray'>유해 컨텐츠 없음</h1>";
     }
 });
-
+//실제 이미지 open(블러처리 삭제)
 function showImage(){
     var image = document.getElementById('image');
     var url=image.getAttribute('src');

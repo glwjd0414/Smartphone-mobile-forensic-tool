@@ -34,7 +34,7 @@
 
         const btn = document.getElementById("select");
         const saveBtn = document.getElementById("save_photo");
-
+        //날짜 선택 시 select.html 창 open
         btn.addEventListener("click", () => {
             win = new BrowserWindow({
                 width: 630,
@@ -54,12 +54,12 @@
             win.show();
             
         });
-
+        //저장할 사진 선택 후 파일 저장 위치 dialog open 요청
         saveBtn.addEventListener("click", () =>{
             var checkbox = document.getElementsByName('save');
             ipcRenderer.send('open-file-dialog');
         })
-
+        //저장 위치 선택 완료 후 사진 저장(copy)
         ipcRenderer.on('selected-directory', (event, path) => {
             var parent_dir = new String();
             var num = __dirname.indexOf("src");
@@ -85,13 +85,14 @@
         })
 
         let result;
-
+        //선택한 날짜의 사진 모두 받아 출력
         ipcRenderer.on("select_result", (e, arg) => {
             result = arg.result;
             document.getElementById('selected-date').innerHTML = arg.start + " - " +arg.end;
             print_photo();
         });
 
+        //사진 출력
         function print_photo(){
         const results = document.getElementById('r');
         var myHTML = '';
