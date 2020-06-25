@@ -32,18 +32,25 @@
 #### 사전준비
 > **1. Android Debug Bridge 설치**<br>
 > Android Debug Bridge is command-line tool that lets you communicate with a device.<br>
-> adb 파일을 src/forensic_tool_desktop/에 위치시킨다.<br><br>
+> adb 파일을 source/forensic_tool/에 위치시킨다.<br><br>
 > **2. Android Backup Extractor 설치**<br>
 > Android Backup Extractor is utility to extract and repack Android backups created with adb backup.<br>
-> abe.jar 파일을 src/forensic_tool_desktop/에 위치시킨다.<br><br>
+> abe.jar 파일을 source/forensic_tool/에 위치시킨다.<br><br>
 > **3. ip address 재설정**<br>
-> android application은 소켓통신을 통해 desktop application에게 db 생성이 끝났음을 알린다. 그러므로 apk파일 생성 전에 src/forensic_tool_android/app/src/main/java/com/forencis_tool/android/LoadingActivity.java 67 라인의 ip address를 자신의 ip address로 변경한다.<br>
+> android application은 소켓통신을 통해 desktop application에게 db 생성이 끝났음을 알린다. 그러므로 apk파일 생성 전에 src/DataExtraction/app/src/main/java/com/example/dataextraction/LoadingActivity.java 67 라인의 ip address를 자신의 ip address로 변경한다.<br>
 > windows의 경우 ipconfig 커맨드를 통해 ip address 확인<br><br>
 > **4. Apk File 빌드**<br>
-> (src/forensic_tool_android/) Signed APK 파일을 생성하고, src/forensic_tool_desktop/에 위치시킨다.<br>
+> (source/forensic_tool/) Signed APK 파일을 생성하고, source/forensic_tool/에 위치시킨다.<br>
 
 <br><br>
-
+### forensic tool 실행 방법
+> electron desktop ap 실행을 위한 환경 설정은 [링크](https://www.electronjs.org/docs/tutorial/development-environment#setting-up-windows, "electron") 참조   <br>
+> ```
+> $ npm install
+> $ npm run rebuild
+> $ npm start
+> ```
+<br><br>
 ### 데이터 추출   
 > 앞서 진행한 ‘안드로이드 스마트폰 정보 추출 방법에 관한 연구’를 기반으로 데이터를 추출한다. 제시한 4가지 방법 중 Content Provider를 통해 데이터를 추출하는 안드로이드 API와 PC에서 기기와 통신할 수 있도록 하는 adb 도구의 backup 기능을 활용한다. API를 통해 추출 가능한 데이터 중 본 연구에서 활용할 데이터는 다음과 같다.   
 > <img src="./image/002.png" width="500px" alt="data extraction"></img>    
