@@ -35,6 +35,7 @@ var mysql = {
 	password: '1234'
 };
 
+//1. apk 파일을 연결된 스마트폰 기기에 설치 및 애플리케이션을 실행
 function apkInstall(){
 	cmd_install = exec('adb -s '+device+' install -r app-release.apk',function(error, stdout, stderr){
 		cc.innerHTML="install apk";
@@ -68,6 +69,7 @@ function convertToMysql(){
 	})
 }
 
+//4. 추출한 .db 파일을 .sql 파일로 변환하여 mysql에 등록
 function convertToMysql(){
 	cmd_sqlIdb = exec('sqlite3 InnerDatabase.db .dump | python SQLiteToMysql.py > InnerDatabase.sql',function(error, stdout, stderr){
     cc.innerHTML="make InnerDB SQL";
@@ -91,6 +93,7 @@ function convertToMysql(){
   })
 }
 
+//3. adb backup 명령어를 통해 데이터베이스 추출
 function extractDB () {
 	cmd_backup = exec('adb -s '+device+' backup com.example.dataextraction -f backup.dataextraction.ad', function(error, stdout, stderr){
 		cc.innerHTML="backup app";
@@ -113,7 +116,7 @@ function extractDB () {
   cmd_backup();
 }
 
-//db insert done
+//2. 애플리케이션에서 데이터베이스 생성이 끝나면 알림
 io.on('connection', function(socket){
 	var instanceId = socket.id;
 
