@@ -1,5 +1,6 @@
 var choosed_menu="analysis1";
 
+//차트 생성을 위한 text, array 변수
 var title_text="통계";
 var label_text=[];
 var label_data1_text="수";
@@ -20,6 +21,7 @@ var label_data3_nu=[];
 var label_data4_text_nu="수";
 var label_data4_nu=[];
 
+//특정 기간, 특정 연락처와의 분석을 위한 변수
 var date_start="";
 var date_end="";
 var number=[];
@@ -33,6 +35,7 @@ var timeline_date_end="";
 var timeline_number=[];
 var restime_number=[];
 
+//최근 6개월 통계 분석을 위한 변수
 var month_6=[];
 var logcount_6=[];
 var callcount_6=[];
@@ -43,6 +46,7 @@ var callcount_6nu=[];
 var smscount_6nu=[];
 var durationsum_6nu=[];
 
+//전체 통계 분석을 위한 변수
 var month=[];
 var logcount=[];
 var callcount=[];
@@ -53,6 +57,7 @@ var callcount_nu=[];
 var smscount_nu=[];
 var durationsum_nu=[];
 
+//특정 기간 통계 분석을 위한 변수
 var month_b=[];
 var logcount_b=[];
 var callcount_b=[];
@@ -63,6 +68,7 @@ var callcount_bnu=[];
 var smscount_bnu=[];
 var durationsum_bnu=[];
 
+//특정 연락처와의 통계 분석을 위한 변수
 var month_w=[];
 var logcount_w=[];
 var callcount_w=[];
@@ -73,6 +79,7 @@ var callcount_wnu=[];
 var smscount_wnu=[];
 var durationsum_wnu=[];
 
+//연락 순위 분석을 위한 변수
 var ranking_rnu=[];
 var logcount_rnu=[];
 var callcount_rnu=[];
@@ -84,6 +91,7 @@ var smscount_rnus=[];
 var ranking_rnud=[];
 var durationsum_rnud=[];
 
+//특정 기간 연락 순위 분석을 위한 변수
 var ranking_brnu=[];
 var logcount_brnu=[];
 var callcount_brnu=[];
@@ -95,6 +103,7 @@ var smscount_brnus=[];
 var ranking_brnud=[];
 var durationsum_brnud=[];
 
+//연락 시간대 분석을 위한 변수
 var timeline=[];
 var logcount_t=[];
 var callcount_t=[];
@@ -117,6 +126,7 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
+//특정 기간 입력시, calllog 범위를 넘지 않도록 최소 및 최대값 설정
 connection.query('select MIN(date) "min", MAX(date) "max" from calllog;', function(err, rows,fields){
 	if(!err){
 		document.getElementById('between_date_start').min=(rows[0].min.toISOString().split("T")[0]);
@@ -141,10 +151,13 @@ connection.query('select MIN(date) "min", MAX(date) "max" from calllog;', functi
 		cc.innerHTML='Error-#0/minmax';
 })
 
+//calllog_month 테이블
+//매월의 연락 수, 통화 수, 문자 수, 통화 시간 합계 저장
 connection.query('drop table if exists calllog_month; create table calllog_month(date datetime not null, logcount int, callcount int, smscount int, durationsum int, primary key(date)); insert into calllog_month(date, callcount, durationsum)  (select date_format(date, "%Y-%m-02 00:00:00"), count(*), sum(duration) from calllog where type in (1,2,3) group by date_format(date, "%Y-%m-02 00:00:00")); update calllog_month cm left join (select date_format(date, "%Y-%m-02 00:00:00") "date", count(*) "count" from calllog group by date_format(date, "%Y-%m-02 00:00:00")) temp on cm.date=temp.date set cm.logcount=temp.count, cm.smscount=cm.logcount-cm.callcount;', function(err, rows, fields){
 	if(err)
 		cc.innerHTML='Error-#1';
 	else{
+		//최근 6개월
 		connection.query('select * from calllog_month order by date DESC limit 6;', function(err, rows, fields){
 			if(!err){
 				for(var i=0;i<rows.length;i++){
@@ -159,6 +172,7 @@ connection.query('drop table if exists calllog_month; create table calllog_month
 				cc.innerHTML='Error-#2';
 		});
 
+		//최근 6개월 누적
 		connection.query('select a.date, sum(b.logcount) "logcount", sum(b.callcount) "callcount", sum(b.smscount) "smscount", sum(b.durationsum) "durationsum" from (select * from calllog_month order by date DESC limit 6) a, (select * from calllog_month order by date DESC limit 6) b where a.date>=b.date group by date order by a.date;', function(err, rows, fields){
 			if(!err){
 				for(var i=0;i<rows.length;i++){
@@ -172,6 +186,7 @@ connection.query('drop table if exists calllog_month; create table calllog_month
 				cc.innerHTML='Error-#3';
 		});
 
+		//전체
 		connection.query('select * from calllog_month order by date;', function(err, rows, fields){
 			if(!err){
 				for(var i=0;i<rows.length;i++){
@@ -186,6 +201,7 @@ connection.query('drop table if exists calllog_month; create table calllog_month
 				cc.innerHTML='Error-#4';
 		});
 
+		//전체 누적
 		connection.query('select a.date, sum(b.logcount) "logcount", sum(b.callcount) "callcount", sum(b.smscount) "smscount", sum(b.durationsum) "durationsum" from calllog_month a, calllog_month b where a.date>=b.date group by date order by a.date;', function(err, rows, fields){
 			if(!err){
 				for(var i=0;i<rows.length;i++){
@@ -201,10 +217,13 @@ connection.query('drop table if exists calllog_month; create table calllog_month
 	}
 });
 
+//calllog_user 테이블
+//특정 사용자와의 통화 수, 문자 수, 통화 시간 저장
 connection.query('drop table if exists calllog_user; create table calllog_user(name varchar(255), number varchar(20) not null, callcount int, smscount int, durationsum int, primary key(number)); insert into calllog_user(name, number, callcount, durationsum) (select name, number, count(*), sum(duration) from calllog where type in (1,2,3) group by number); update calllog_user cu left join (select number, count(*) "count" from calllog where type not in (1,2,3) group by number) calllog on cu.number=calllog.number set cu.smscount=ifnull(calllog.count,0);', function(err, rows, fields){
 	if(err)
 		cc.innerHTML='Error-#6';
 	else{
+		//연락 수 기준 정렬
 		connection.query('select name, number, callcount, smscount from calllog_user order by callcount+smscount desc', function(err, rows, fields){
 			if(!err){
 				for(var i=0;i<rows.length;i++){
@@ -222,6 +241,7 @@ connection.query('drop table if exists calllog_user; create table calllog_user(n
 				cc.innerHTML='Error-#7';
 		});
 
+		//통화 수 기준 정렬
 		connection.query('select name, number, callcount from calllog_user order by callcount desc', function(err, rows, fields){
 			if(!err){
 				for(var i=0;i<rows.length;i++){
@@ -237,6 +257,7 @@ connection.query('drop table if exists calllog_user; create table calllog_user(n
 				cc.innerHTML='Error-#8';
 		});
 
+		//문자 수 기준 정렬
 		connection.query('select name, number, smscount from calllog_user order by smscount desc', function(err, rows, fields){
 			if(!err){
 				for(var i=0;i<rows.length;i++){
@@ -252,6 +273,7 @@ connection.query('drop table if exists calllog_user; create table calllog_user(n
 				cc.innerHTML='Error-#9';
 		});
 
+		//통화 시간 기준 정렬
 		connection.query('select name, number, durationsum from calllog_user order by durationsum desc', function(err, rows, fields){
 			if(!err){
 				for(var i=0;i<rows.length;i++){
@@ -270,7 +292,8 @@ connection.query('drop table if exists calllog_user; create table calllog_user(n
 })
 
 		
-
+//calllog_hour 테이블
+//각 시간별 통화 수, 문자 수 저장
 connection.query('drop table if exists calllog_hour; create table calllog_hour(hour int not null, callcount int, smscount int, primary key(hour)); set @hour:=-1; insert into calllog_hour(hour, callcount) (select (@hour:=@hour+1) "hour", (select count(*) from calllog where type in (1,2,3) and hour(date)=@hour) "count" from calllog where @hour<23); update calllog_hour ch left join (select hour(date) "hour", count(*) "count" from calllog where type not in (1,2,3) group by hour(date)) calllog on ch.hour=calllog.hour set ch.smscount=ifnull(calllog.count,0);', function(err, rows, fields){
 	if(err)
 		cc.innerHTML='Error-#11';
@@ -290,6 +313,7 @@ connection.query('drop table if exists calllog_hour; create table calllog_hour(h
 	}
 })
 
+//차트 생성을 위한 options
 var options = {
 	responsive: false,
 	title:{
@@ -306,6 +330,7 @@ var options = {
     }
 };
 
+//연락 수 차트 생성을 위한 stacked options
 var options_stacked = {
 	responsive: false,
 	title:{
@@ -466,6 +491,7 @@ var options_main_nu_stacked={
    	options: options_stacked
 };
 
+//각 세부 메뉴 클릭시 상단에 띄울 title 지정
 function change_type_title(type_number){
 	switch(type_number){
 		case 1:
@@ -501,6 +527,8 @@ function change_type_title(type_number){
 	}
 }
 
+//각 세부 메뉴 클릭시 띄울 데이터 지정
+//bar 차트
 function changeLabelText(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s){
 	options_main_stacked.type="bar";
 	options_main_stacked.data.labels=a;
@@ -557,6 +585,8 @@ function changeLabelText(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s){
 	options_main_nu_stacked.options=options_stacked;
 }
 
+//각 세부 메뉴 클릭시 띄울 데이터 지정
+//수평 bar 차트
 function changeLabelText_hor(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s){
 	options_main_stacked.type="horizontalBar";
 	options_main_stacked.data.labels=a;
@@ -591,6 +621,7 @@ function changeLabelText_hor(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s){
 	options_main_stacked.options=options_stacked;
 }
 
+//list, chart, choice title 공간 분리
 const ctx = document.getElementById("myChart").getContext('2d');
 const listspace = document.getElementById("listspace");
 const listspace2 = document.getElementById("listspace2");
@@ -600,6 +631,7 @@ const listspace5 = document.getElementById("listspace5");
 const chartspace = document.getElementById("chart");
 const choicespace = document.getElementById("choice");
 
+//chart 공간만 출력
 function chartView(){
 	listspace.style="display:none";
 	listspace2.style="display:none";
@@ -609,6 +641,9 @@ function chartView(){
 	chartspace.style="display:inline";
 	choicespace.style="display:inline";
 }
+
+//상세 메뉴 클릭시 그에 해당하는 공간 출력, title 구성, 데이터 지정, 차트/리스트 구성
+//차트
 var analysis1 = document.getElementById('analysis1');
 analysis1.addEventListener('click', function(){
 	chartView();
@@ -657,6 +692,8 @@ analysis4.addEventListener('click', function(){
 	window.myChart = new Chart(ctx, options_main_stacked);
 });
 
+//상세 메뉴 클릭시 그에 해당하는 공간 출력, 메뉴 이름 지정
+//리스트
 var list1 = document.getElementById('list1');
 list1.addEventListener('click', function(){
 	listspace.style="display:inline";
@@ -759,6 +796,7 @@ more5.addEventListener('click', function(){
 	window.myChart = new Chart(ctx, options_main_stacked);
 });
 
+//title 클릭 시 상세 메뉴에 따라 차트 구성
 var type1 = document.getElementById('type1');
 type1.addEventListener('click', function(){
 	switch(choosed_menu){
@@ -888,7 +926,8 @@ type8.addEventListener('click', function(){
 	};
 });
 
-
+//calllog_between 테이블
+//특정 기간의 연락 수, 통화 수, 문자 수, 통화 시간 저장
 function get_date_analysis(){
 
 	date_start=document.getElementById('between_date_start').value+' 00:00:00';
@@ -900,6 +939,7 @@ function get_date_analysis(){
 
 	connection.query('drop table IF EXISTS calllog_between; create table calllog_between(date datetime not null, logcount int, callcount int, smscount int, durationsum int, primary key(date)); insert into calllog_between(date, callcount, durationsum)  (select date_format(date, "%Y-%m-02 00:00:00"), count(*), sum(duration) from calllog where type in (1,2,3) and date between ? and ? group by date_format(date, "%Y-%m-02 00:00:00")); update calllog_between cb left join (select date_format(date, "%Y-%m-02 00:00:00") "date", count(*) "count" from calllog where date between ? and ? group by date_format(date, "%Y-%m-02 00:00:00")) temp on cb.date=temp.date set cb.logcount=temp.count, cb.smscount=cb.logcount-cb.callcount;',[date_start, date_end,date_start, date_end], function(err, rows){
 		if(!err){
+			//특정 기간
 			connection.query('select * from calllog_between order by date;', function(err, rows, fields){
 				if(!err){
 					month_b.length = 0;
@@ -919,6 +959,8 @@ function get_date_analysis(){
 				else
 					cc.innerHTML='Error-#14'+err;
 			});
+
+			//특정 기간 누적
 			connection.query('select a.date, sum(b.logcount) "logcount", sum(b.callcount) "callcount", sum(b.smscount) "smscount", sum(b.durationsum) "durationsum" from calllog_between a, calllog_between b where a.date>=b.date group by date order by a.date;', function(err, rows, fields){
 				if(!err){
 					logcount_bnu.length = 0;
@@ -949,6 +991,7 @@ function get_date_analysis(){
 	//connection.end();
 }
 
+//특정 연락처 목록에 연락처 추가/삭제
 function get_number_push(){
 	number.push(document.getElementById('number').value);
 	analysis4_list.innerHTML=number.join('<br>');
@@ -957,6 +1000,8 @@ function get_number_pop(){
 	number.splice(number.indexOf(document.getElementById('number').value),1);
 	analysis4_list.innerHTML=number.join('<br>');
 }
+//calllog_with 테이블
+//특정 연락처와의 연락 수, 통화 수, 문자 수, 통화 시간 저장
 function get_number_analysis(){
 	chartView();
 	change_type_title(1);
@@ -964,6 +1009,7 @@ function get_number_analysis(){
 
 	connection.query('drop table IF EXISTS calllog_with; create table calllog_with(date datetime not null, logcount int, callcount int, smscount int, durationsum int, primary key(date)); insert into calllog_with(date, callcount, durationsum)  (select date_format(date, "%Y-%m-02 00:00:00"), count(*), sum(duration) from calllog where type in (1,2,3) and number in (?) group by date_format(date, "%Y-%m-02 00:00:00")); update calllog_with cw left join (select date_format(date, "%Y-%m-02 00:00:00") "date", count(*) "count" from calllog where number in (?) group by date_format(date, "%Y-%m-02 00:00:00")) temp on cw.date=temp.date set cw.logcount=temp.count, cw.smscount=cw.logcount-cw.callcount;',[number, number], function(err, rows){
 		if(!err){
+			//특정 연락처
 			connection.query('select * from calllog_with order by date;', function(err, rows, fields){
 				if(!err){
 					month_w.length = 0;
@@ -983,6 +1029,8 @@ function get_number_analysis(){
 				else
 					cc.innerHTML='Error-#17'+err;
 			});
+
+			//특정 연락처 누적
 			connection.query('select a.date, sum(b.logcount) "logcount", sum(b.callcount) "callcount", sum(b.smscount) "smscount", sum(b.durationsum) "durationsum" from calllog_with a, calllog_with b where a.date>=b.date group by date order by a.date;', function(err, rows, fields){
 				if(!err){
 					logcount_wnu.length = 0;
@@ -1012,6 +1060,8 @@ function get_number_analysis(){
 	//connection.end();
 }
 
+//calllog_user_between 테이블
+//특정 기간의 통화 수, 문자 수, 통화 시간을 연락처별로 저장
 function get_date_rank(){
 	chartView();
 	change_type_title(4);
@@ -1024,6 +1074,7 @@ function get_date_rank(){
 		if(err)
 			cc.innerHTML='Error-#19';
 		else{
+			//연락 수
 			connection.query('select name, number, callcount, smscount from calllog_user_between order by callcount+smscount desc', function(err, rows, fields){
 			if(!err){
 				ranking_brnu.length=0;
@@ -1046,6 +1097,7 @@ function get_date_rank(){
 				cc.innerHTML='Error-#20';
 		});
 
+		//통화 수
 		connection.query('select name, number, callcount from calllog_user_between order by callcount desc', function(err, rows, fields){
 			if(!err){
 				ranking_brnuc.length=0;
@@ -1064,6 +1116,7 @@ function get_date_rank(){
 				cc.innerHTML='Error-#21';
 		});
 
+		//문자 수
 		connection.query('select name, number, smscount from calllog_user_between order by smscount desc', function(err, rows, fields){
 			if(!err){
 				ranking_brnus.length=0;
@@ -1082,6 +1135,7 @@ function get_date_rank(){
 				cc.innerHTML='Error-#22';
 		});
 
+		//통화 시간
 		connection.query('select name, number, durationsum from calllog_user_between order by durationsum desc', function(err, rows, fields){
 			if(!err){
 				ranking_brnud.length=0;
@@ -1109,6 +1163,8 @@ function get_date_rank(){
 	//connection.end();
 }
 
+//calllog_hour_between 테이블
+//특정 기간의 시간대별 통화 수, 문자 수 저장
 function get_date_timeline(){
 	chartView();
 	change_type_title(5);
@@ -1146,6 +1202,7 @@ function get_date_timeline(){
 	//connection.end();
 }
 
+//특정 연락처 목록에 연락처 추가/삭제
 function get_number_timeline_push(){
 	timeline_number.push(document.getElementById('timeline_number').value);
 	more5_list.innerHTML=timeline_number.join('<br>');
@@ -1154,6 +1211,8 @@ function get_number_timeline_pop(){
 	timeline_number.splice(timeline_number.indexOf(document.getElementById('timeline_number').value),1);
 	more5_list.innerHTML=timeline_number.join('<br>');
 }
+//calllog_hour_with 테이블
+//특정 연락처와의 시간대별 통화 수, 문자 수 저장
 function get_number_timeline(){
 	chartView();
 	change_type_title(5);
@@ -1188,6 +1247,7 @@ function get_number_timeline(){
 	//connection.end();
 }
 
+//리스트 생성을 위한 options
 var options_list = {
   valueNames: [ 'type','type_cs','type_gs', 'number', 'date','body', 'duration', 'delete' ],
   item: '<div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-success shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><li id="listrow"><h3 id="listrow_type" class="type"></h3><div id=m2><p id="listrow_number" class="number"></p><p id="listrow_date" class="date"></p></div><p id="listrow_body" class="body"></p></li></div></div></div></div></div>'
@@ -1198,17 +1258,20 @@ var options_list_res = {
   item: '<div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-success shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><li id="listrow"><h3 id="listrow_number" class="number"></h3><div id=m3><p id="listrow_get_body" class="get_body"></p><p id="listrow_get_date" class="get_date"></p></div><div id=m3><p id="listrow_send_body" class="send_body"></p><p id="listrow_send_date" class="send_date"></p></div><p id="listrow_timediff" class="timediff"></p></li></div></div></div></div></div>'
 };
 
+//리스트에 추가할 데이터를 임시 저장할 변수
 var values_list_6 = [];
 var values_list_all = [];
 var values_list_between=[];
 var values_list_res=[];
 var values_list_res_with=[];
+//리스트
 var myList;
 var myList2;
 var myList3=new List('listspace3', options_list, values_list_between);
 var myList4;
 var myList5=new List('listspace5', options_list_res, values_list_res_with);
 
+//최근 1개월 통화 및 문자 목록
 connection.query('select calllog.type, calllog.number, calllog.name, calllog.date, calllog.duration, sms.body, sms.read_c from calllog left join sms on calllog.number=sms.address and timestampdiff(second,calllog.date, sms.date) between -5 and 0 where timestampdiff(month,now(),calllog.date)>-1;',function(err, rows){
 	if(!err){
 		for(var i=0;i<rows.length;i++){
@@ -1219,12 +1282,14 @@ connection.query('select calllog.type, calllog.number, calllog.name, calllog.dat
 			var type_cs_temp="";
 			var type_gs_temp="";
 			var delete_temp="false";
+
 			if(!rows[i].name)
 				number_temp=rows[i].number+" ( - )";
 			else
 				number_temp=rows[i].number+" ("+rows[i].name+")";
 
 			var date_temp=rows[i].date.toISOString().split("T")[0]+" "+rows[i].date.toISOString().split("T")[1].slice(0,8);
+			//연락 type에 따라 수신/발신/부재중 통화/문자 구분
 			switch(rows[i].type){
 				case 1:
 					type_temp="수신 통화";
@@ -1308,6 +1373,7 @@ connection.query('select calllog.type, calllog.number, calllog.name, calllog.dat
 		cc.innerHTML='Error-#list1'+err;
 });
 
+//전체 통화 및 문자 목록 
 connection.query('select calllog.type, calllog.number, calllog.name, calllog.date, calllog.duration, sms.body, sms.read_c from calllog left join sms on calllog.number=sms.address and timestampdiff(second,calllog.date, sms.date) between -5 and 0 ;',function(err, rows){
 	if(!err){
 		for(var i=0;i<rows.length;i++){
@@ -1407,7 +1473,9 @@ connection.query('select calllog.type, calllog.number, calllog.name, calllog.dat
 		cc.innerHTML='Error-#list2'+err;
 });
 
+//특정 기간의 통화 및 문자 목록
 function get_date_list(){
+	//출력할 공간 지정
 	listspace.style="display:none";
 	listspace2.style="display:none";
 	listspace3.style="display:inline";
@@ -1523,6 +1591,7 @@ function get_date_list(){
 	//connection.end();
 }
 
+//리스트 출력 시 특정 조건에 맞는 데이터 거르는 filter
 var filter1List=[];
 var filter2List=[];
 var filter3List=[];
@@ -1549,9 +1618,11 @@ function filter_listener(event){
 	}
 }
 function filter_action(paramlist, checked_temp, filter_temp, value_temp, icon_temp, myList_temp){
+	//체크 시
 	if (checked_temp){
 		document.getElementById(icon_temp).style="display:inline";
 
+		//paramlist에 [필터 종류, 데이터 종류] 저장 (여러 항목에 체크를 위함)
     	paramlist.push(filter_temp);
     	paramlist.push(value_temp);
 
@@ -1567,6 +1638,7 @@ function filter_action(paramlist, checked_temp, filter_temp, value_temp, icon_te
             	return false;
     	});
 	}
+	//체크 해제 시
 	else{
 		document.getElementById(icon_temp).style="display:none";
 
@@ -1595,6 +1667,7 @@ for (var i = 0; i < filter3_element.length; i++) {
     filter3_element[i].addEventListener('click', filter_listener, false);
 }
 
+//답장 시간 리스트 출력을 위한 상세 메뉴 클릭 함수 지정
 var more6 = document.getElementById('more6');
 more6.addEventListener('click', function(){
 	listspace.style="display:none";
@@ -1623,11 +1696,14 @@ more7.addEventListener('click', function(){
 	window.myChart.destroy();
 });
 
-
+//sms_response 테이블
+//전체 문자 목록에 대해 답장만을 추출
+//답장 판단 기준) 발신 문자에 대해 수신 number 같은 문자들 비교, 문자 간격이 2일 이하면 답장으로 판단하여 조인, 조인한 것 중 가장 마지막 수신 문자에 첫 발신만 추림. calllog와 sms 테이블의 문자 시간이 정확하게 일치하지 않아서 시간 텀 약간 주고 join
 connection.query('drop table if exists sms_response; create table sms_response (number text, got_date datetime, got_body text, send_date datetime, send_body text, time int); insert into sms_response SELECT sms1.address, sms1.date,sms1.body, sms2.date, sms2.body,timestampdiff(second, sms1.date, sms2.date) FROM sms sms1, sms sms2 where sms1.tid=sms2.tid and sms1.type=1 and sms2.type=2 and timestampdiff(second, sms1.date, sms2.date) >0 and timestampdiff(day,sms2.date, sms1.date)< 2; delete sms1 from sms_response sms1, sms_response sms2 where sms1.send_date=sms2.send_date and timestampdiff(second, sms2.got_date,sms1.got_date)<0; delete sms1 from sms_response sms1, sms_response sms2 where sms1.got_date=sms2.got_date and timestampdiff(second, sms2.send_date,sms1.send_date)>0;', function(err, rows, fields){
 	if(err)
 		cc.innerHTML='Error-#27';
 	else{
+		//평균
 		connection.query('select avg(time) "avg" from sms_response;', function(err, rows, fields){
 			if(!err){
 				var tttt=rows[0].avg;
@@ -1644,6 +1720,7 @@ connection.query('drop table if exists sms_response; create table sms_response (
 				cc.innerHTML='Error-#28'+err;
 		});
 
+		//답장 목록
 		connection.query('select * from sms_response;', function(err, rows, fields){
 			if(!err){
 				for(var i=0;i<rows.length;i++){
@@ -1671,9 +1748,6 @@ connection.query('drop table if exists sms_response; create table sms_response (
 	}
 })
 
-		
-
-
 function get_number_restime_push(){
 	restime_number.push(document.getElementById('restime_number').value);
 	more7_list.innerHTML=restime_number.join('<br>');
@@ -1682,6 +1756,7 @@ function get_number_restime_pop(){
 	restime_number.splice(restime_number.indexOf(document.getElementById('restime_number').value),1);
 	more7_list.innerHTML=restime_number.join('<br>');
 }
+//특정 연락처와의 답장 시간
 function get_number_restime(){
 	listspace.style="display:none";
 	listspace2.style="display:none";

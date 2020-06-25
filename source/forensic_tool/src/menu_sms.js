@@ -1,3 +1,4 @@
+//키워드 분석을 위한 pythonshell
 const {PythonShell}=require('python-shell');
 
 var choosed_menu="";
@@ -61,6 +62,7 @@ var payment_13_count=[];
 var payment_14_list=[];
 var payment_14_count=[];
 
+//차트 및 리스트 공간 할당
 const canvas = document.getElementById("myChart")
 const ctx=canvas.getContext('2d');
 const choicespace = document.getElementById("choice");
@@ -94,6 +96,7 @@ var payment7 = document.getElementById('payment7');
 var payment8 = document.getElementById('payment8');
 var payment9 = document.getElementById('payment9');
 
+//차트 생성을 위한 options
 var options_charts_1 = {
   responsive: false,
   title:{
@@ -166,6 +169,7 @@ var options_chart_2={
     options: options_charts_2
 };
 
+//결제문자 금액 표시에 자릿수 "," 표시
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -181,6 +185,7 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
+//특정 기간 입력시, calllog 범위를 넘지 않도록 최소 및 최대값 설정
 connection.query('select MIN(date) "min", MAX(date) "max" from calllog;', function(err, rows,fields){
   if(!err){
     document.getElementById('between_date_start').min=(rows[0].min.toISOString().split("T")[0]);
@@ -213,6 +218,7 @@ connection.query('select MIN(date) "min", MAX(date) "max" from calllog;', functi
     cc.innerHTML='Error-#0/minmax';
 });
 
+//리스트 생성을 위한 options
 var options_list = {
   valueNames: [ 'type_cs', 'number', 'date','body', 'keyword' ],
   item: '<div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-success shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><li id="listrow"><div id="m2"><p id="listrow_number" class="number"></p><p id="listrow_date" class="date"></p></div><p id="listrow_body" class="body"></p><p id="listrow_keyword" class="keyword"></p></li></div></div></div></div></div>'
@@ -224,6 +230,7 @@ var options_list_pay = {
   item: '<div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-success shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><li id="listrow"><p id="listrow_bname" class="bname"></p><div id="m2"><p id="listrow_price" class="price"></p><p id="listrow_sname" class="sname"></p></div><div id="m2"><p id="listrow_payment" class="payment"></p><p id="listrow_date" class="date"></p></div></li></div></div></div></div></div>'
 };
 
+//리스트에 추가할 데이터를 임시 저장할 변수
 var values_list = [];
 var values_list_1 = [];
 var values_list_all = [];
@@ -235,7 +242,7 @@ var values_list_card_rank=[];
 var values_list_card_rank_between=[];
 var values_list_store_rank=[];
 var values_list_store_rank_between=[];
-
+//리스트
 var myList;
 var myList1 = new List("keyword1space", options_list, values_list_1);
 var myList2 = new List("keyword2space", options_list, values_list_all);
@@ -253,6 +260,7 @@ connection.query('update contact set number=replace(number,"-","");', function(e
     cc.innerHTML='Error-#1.0-contact replace';
 });
 
+//pythonshell option
 let option = {
   mode: 'text',
   pythonPath: 'py',
@@ -262,6 +270,7 @@ let option = {
   encoding: 'utf8'
 };
 
+//전체 문자의 정보와 키워드를 받아옴
 PythonShell.run('src/analysis_message.py', option, function(err, result){
   if(err)
     console.log(err);
@@ -279,6 +288,7 @@ PythonShell.run('src/analysis_message.py', option, function(err, result){
   }
 });
 
+//최근 1개월 문자의 언급 수 상위 20개 키워드와 언급 횟수 받아옴
 PythonShell.run('src/analysis_message_rank_recent.py', option, function(err, result){
   if(err)
     console.log(err);
@@ -296,6 +306,7 @@ PythonShell.run('src/analysis_message_rank_recent.py', option, function(err, res
   }
 });
 
+//전체 문자의 언급 수 상위 20개 키워드와 언급 횟수 받아옴
 PythonShell.run('src/analysis_message_rank_all.py', option, function(err, result){
   if(err)
     console.log(err);
@@ -313,10 +324,13 @@ PythonShell.run('src/analysis_message_rank_all.py', option, function(err, result
   }
 });
 
+//sms_bank 테이블
+//결제 문자의 데이터 저장
 PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
   if(err)
     cc.innerHTML="Error-analysis_message_bank.py";
   else{
+    //결제 문자의 데이터 받아옴
     connection.query('select * from sms_bank;', function(err, rows, fields){
       if(err)
         cc.innerHTML='Error-#2.0-payment select';
@@ -328,6 +342,7 @@ PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
           var bname_temp=rows[i].bname;
           var sname_temp=rows[i].sname;
           var payplan_temp=rows[i].paymentplan;
+          //filter 구현을 위한 추가 정보 - payplan__temp, amount_temp
           var payplan__temp=rows[i].paymentplan;
           if (payplan__temp != "체크"&&payplan__temp!="일시불"){
             payplan__temp="할부";
@@ -341,6 +356,7 @@ PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
       }
     });
 
+    //월별 결제 금액
     connection.query('SELECT date_format(date, "%Y-%m-02 00:00:00") "date", sum(price) "sum" FROM sms_bank group by date_format(date, "%Y-%m-02 00:00:00") order by date_format(date, "%Y-%m-02 00:00:00");', function(err, rows, fields){
       if(!err){
         for(var i=0;i<rows.length;i++){
@@ -354,6 +370,7 @@ PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
         cc.innerHTML='Error-query-#payment_1';
     });
 
+    //월별 누적 결제 금액
     connection.query('SELECT s1.date "date", sum(s2.sum) "sum" FROM (SELECT date_format(date, "%Y-%m-02 00:00:00") "date", sum(price) "sum" FROM sms_bank group by date_format(date, "%Y-%m-02 00:00:00") order by date_format(date, "%Y-%m-02 00:00:00")) s1, (SELECT date_format(date, "%Y-%m-02 00:00:00") "date", sum(price) "sum" FROM sms_bank group by date_format(date, "%Y-%m-02 00:00:00") order by date_format(date, "%Y-%m-02 00:00:00")) s2 where s1.date>=s2.date group by s1.date order by s1.date;', function(err, rows, fields){
       if(!err){
         for(var i=0;i<rows.length;i++){
@@ -367,6 +384,8 @@ PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
         cc.innerHTML='Error-query-#payment_2';
     });
 
+    //sms_bank_hour
+    //시간대별 결제 수 저장
     connection.query('drop table if exists sms_bank_hour; create table sms_bank_hour(hour int not null, smscount int, primary key(hour)); set @hour:=-1; insert into sms_bank_hour(hour, smscount) (select (@hour:=@hour+1) "hour", (select count(*) from sms_bank where hour(date)=@hour) "count" from sms where @hour<23);', function(err, rows, fields){
       if(!err){
         connection.query('select * from sms_bank_hour order by hour;', function(err, rows, fields){
@@ -382,6 +401,7 @@ PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
         cc.innerHTML='Error-query-#payment_5';
     });
 
+    //카드 이용 순위 결제 횟수 순 정렬
     connection.query('select bname, count(*) "count" from sms_bank group by bname order by count(*) desc;', function(err, rows, fields){
       if(!err){
         for(var i=0;i<rows.length;i++){
@@ -395,6 +415,7 @@ PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
         cc.innerHTML='Error-query-#payment_7';
     });
 
+    //카드 이용 순위 누적 금액 순 정렬
     connection.query('select bname, sum(price) "sum" from sms_bank group by bname order by sum(price) desc;', function(err, rows, fields){
       if(!err){
         for(var i=0;i<rows.length;i++){
@@ -408,6 +429,7 @@ PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
         cc.innerHTML='Error-query-#payment_8';
     });
 
+    //사용처 이용 순위 결제 횟수 순 정렬
     connection.query('select sname, count(*) "count" from sms_bank group by sname order by count(*) desc;', function(err, rows, fields){
       if(!err){
         for(var i=0;i<rows.length;i++){
@@ -421,6 +443,7 @@ PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
         cc.innerHTML='Error-query-#payment_11';
     });
 
+    //사용처 이용 순위 누적 금액 순 정렬
     connection.query('select sname, sum(price) "sum" from sms_bank group by sname order by sum(price) desc;', function(err, rows, fields){
       if(!err){
         for(var i=0;i<rows.length;i++){
@@ -436,6 +459,7 @@ PythonShell.run('src/analysis_message_bank.py', option, function(err, result){
   }
 });
 
+//chart 공간만 출력
 function chartspaceview(){
   keywordspace.style="display:none";
   choicespace.style="display:none";
@@ -452,6 +476,8 @@ function chartspaceview(){
   payment1space.style="display:none";
 }
 
+//각 세부 메뉴 클릭시 띄울 데이터 지정
+//수직 bar 차트
 function changeLabelText(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s){
 
   options_chart_1.type="bar";
@@ -473,6 +499,8 @@ function changeLabelText(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s){
   options_chart_2.options=options_charts_2;
 }
 
+//각 세부 메뉴 클릭시 띄울 데이터 지정
+//수평 bar 차트
 function changeLabelText_hor(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s){
 
   options_chart_1.type="horizontalBar";
@@ -494,6 +522,7 @@ function changeLabelText_hor(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s){
   options_chart_2.options=options_charts_2;
 }
 
+//전체 문자 키워드 목록 리스트 공간 출력
 keyword0.addEventListener('click', function(){
   keywordspace.style="display:inline";
   choicespace.style="display:none";
@@ -511,12 +540,11 @@ keyword0.addEventListener('click', function(){
   menu_name.innerHTML="전체 기간의 문자의 키워드 목록";
 });
 
+//상세 메뉴 클릭 시 공간 출력, 데이터 지정, 차트 크기 지정, 차트 생성
 keyword1.addEventListener('click', function(){
   choosed_menu="keyword1";
   chartspaceview();
-
   changeLabelText(keyword_1_list,"언급 횟수",keyword_1_count,[],"",[],"최근 1개월의 문자 키워드","최근 1개월의 문자 키워드 순위","# 언급 횟수");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="350";
   document.getElementById("chart-area").style="height:380px;";
@@ -526,9 +554,7 @@ keyword1.addEventListener('click', function(){
 keyword2.addEventListener('click', function(){
   choosed_menu="keyword2";
   chartspaceview();
-
   changeLabelText(keyword_all_list,"언급 횟수",keyword_all_count,[],"",[],"전체 기간의 문자 키워드","전체 기간의 문자 키워드 순위","# 언급 횟수");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="350";
   document.getElementById("chart-area").style="height:380px;";
@@ -538,9 +564,7 @@ keyword2.addEventListener('click', function(){
 keyword3.addEventListener('click', function(){
   choosed_menu="keyword3";
   chartspaceview();
-
   changeLabelText(keyword_between_list,"언급 횟수",keyword_between_count,[],"",[],"특정 기간의 문자 키워드","특정 기간의 문자 키워드 순위 / "+keyword_date_start.split(' ')[0]+" ~ "+keyword_date_end.split(' ')[0],"# 언급 횟수");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="350";
   document.getElementById("chart-area").style="height:380px;";
@@ -550,15 +574,14 @@ keyword3.addEventListener('click', function(){
 keyword4.addEventListener('click', function(){
   choosed_menu="keyword4";
   chartspaceview();
-
   changeLabelText(keyword_with_list,"언급 횟수",keyword_with_count,[],"",[],"특정 연락처와의 문자 키워드","특정 연락처와의 문자 키워드 순위","# 언급 횟수");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="350";
   document.getElementById("chart-area").style="height:380px;";
   window.myChart = new Chart(ctx, options_chart_1);
 });
 
+//결제 문자 목록 리스트 공간 출력
 payment0.addEventListener('click', function(){
   keywordspace.style="display:none";
   choicespace.style="display:none";
@@ -593,15 +616,14 @@ payment1.addEventListener('click', function(){
   menu_name.innerHTML="특정 기간의 결제문자 목록 / "+paylist_date_start.split(' ')[0]+" ~ "+paylist_date_end.split(' ')[0];
 });
 
+//상세 메뉴 클릭 시 공간 출력, title 지정, 데이터 지정, 차트 크기 지정, 차트 생성
 payment2.addEventListener('click', function(){
   chartspaceview();
   type1.innerHTML="# 결제 금액";
   type2.innerHTML="# 누적 결제 금액";
   choicespace.style="display:inline";
   choosed_menu="payment2";
-
   changeLabelText(payment_1_list,"결제 금액",payment_1_count,payment_2_list,"누적 결제 금액",payment_2_count, "전체 기간의 결제 금액 통계","전체 기간의 결제 금액 통계","# 결제 금액");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="350";
   document.getElementById("chart-area").style="height:380px;";
@@ -614,9 +636,7 @@ payment3.addEventListener('click', function(){
   type2.innerHTML="# 누적 결제 금액";
   choicespace.style="display:inline";
   choosed_menu="payment3";
-
   changeLabelText(payment_3_list,"결제 금액",payment_3_count,payment_4_list,"누적 결제 금액",payment_4_count,"특정 기간의 결제 금액 통계","특정 기간의 결제 금액 통계 / "+date_start.split(' ')[0]+" ~ "+date_end.split(' ')[0],"# 결제 금액");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="350";
   document.getElementById("chart-area").style="height:380px;";
@@ -626,9 +646,7 @@ payment3.addEventListener('click', function(){
 payment4.addEventListener('click', function(){
   chartspaceview();
   choosed_menu="payment4";
-
   changeLabelText(payment_5_list,"결제 횟수",payment_5_count,[],"",[],"전체 기간의 결제 시간대","전체 기간의 결제 시간대","# 결제 횟수");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="350";
   document.getElementById("chart-area").style="height:380px;";
@@ -638,9 +656,7 @@ payment4.addEventListener('click', function(){
 payment5.addEventListener('click', function(){
   chartspaceview();
   choosed_menu="payment5";
-
   changeLabelText(payment_6_list,"결제 횟수",payment_6_count,[],"",[],"특정 기간의 결제 시간대","특정 기간의 결제 시간대 / "+payment_date_start.split(' ')[0]+" ~ "+payment_date_end.split(' ')[0],"# 결제 횟수");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="350";
   document.getElementById("chart-area").style="height:380px;";
@@ -653,9 +669,7 @@ payment6.addEventListener('click', function(){
   type1.innerHTML="# 결제 횟수 기준";
   type2.innerHTML="# 결제 금액 기준";
   choicespace.style="display:inline";
-  
   changeLabelText_hor(payment_7_list,"결제 횟수",payment_7_count,payment_8_list,"결제 금액",payment_8_count,"전체 기간의 카드 이용 순위", "전체 기간의 카드 이용 순위", "# 결제 횟수 기준");
-  
   window.myChart.destroy();
   document.getElementById("myChart").height="1000";
   document.getElementById("chart-area").style="height:1030px;";
@@ -668,9 +682,7 @@ payment7.addEventListener('click', function(){
   type1.innerHTML="# 결제 횟수 기준";
   type2.innerHTML="# 결제 금액 기준";
   choicespace.style="display:inline";
-
   changeLabelText_hor(payment_9_list,"결제 횟수",payment_9_count,payment_10_list,"결제 금액",payment_10_count,"특정 기간의 카드 이용 순위","특정 기간의 카드 이용 순위 / "+card_date_start.split(' ')[0]+" ~ "+card_date_end.split(' ')[0],"# 결제 횟수 기준");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="1000";
   document.getElementById("chart-area").style="height:1030px;";
@@ -683,9 +695,7 @@ payment8.addEventListener('click', function(){
   type1.innerHTML="# 결제 횟수 기준";
   type2.innerHTML="# 결제 금액 기준";
   choicespace.style="display:inline";
-
   changeLabelText_hor(payment_11_list,"결제 횟수",payment_11_count,payment_12_list,"결제 금액",payment_12_count,"전체 기간의 사용처 순위","전체 기간의 사용처 순위","# 결제 횟수 기준");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="1000";
   document.getElementById("chart-area").style="height:1030px;";
@@ -698,15 +708,14 @@ payment9.addEventListener('click', function(){
   type1.innerHTML="# 결제 횟수 기준";
   type2.innerHTML="# 결제 금액 기준";
   choicespace.style="display:inline";
-
   changeLabelText_hor(payment_13_list,"결제 횟수",payment_13_count,payment_14_list,"결제 금액",payment_14_count,"특정 기간의 사용처 순위","특정 기간의 사용처 순위 / "+store_date_start.split(' ')[0]+" ~ "+store_date_end.split(' ')[0],"# 결제 횟수 기준");
-
   window.myChart.destroy();
   document.getElementById("myChart").height="1000";
   document.getElementById("chart-area").style="height:1030px;";
   window.myChart = new Chart(ctx, options_chart_1);
 });
 
+//title 클릭 시 상세 메뉴에 따라 차트 구성
 var type1 = document.getElementById('type1');
 type1.addEventListener('click', function(){
   switch(choosed_menu){
@@ -743,6 +752,8 @@ type2.addEventListener('click', function(){
   window.myChart = new Chart(ctx, options_chart_2);
 });
 
+//특정 기간의 문자 키워드 추출
+//안내 문구 출력, 공간 출력, python shell 통해 키워드 추출, 리스트 구성
 function get_date_keyword(){
   menu_name.innerHTML="특정 기간의 문자 키워드 추출 중...";
   keyword3.style="text-decoration:line-through";
@@ -801,6 +812,8 @@ function get_date_keyword(){
   //connection.end();
 }
 
+//특정 연락처와의 문자 키워드 추출
+//안내 문구 출력, 공간 출력, python shell 통해 키워드 추출, 리스트 구성
 function get_number_push(){
   number.push(document.getElementById('number').value);
   keyword4_list.innerHTML=number.join('<br>');
@@ -864,7 +877,8 @@ function get_number_keyword(){
   //connection.end();
 }
 
-
+//특정 기간의 결제 목록 추출
+//공간 출력, values_payment_list_all 배열에 저장된 데이터 중 특정 기간에 해당하는 결제 문자의 리스트 구성
 function get_paylist_date_payment(){
   keywordspace.style="display:none";
   choicespace.style="display:none";
@@ -905,6 +919,7 @@ function get_paylist_date_payment(){
   myList5_1 = new List("payment1space", options_list_pay, values_payment_list_between);
 }
 
+//특정 기간의 결제 금액 차트 구성
 function get_amount_date_payment(){
   chartspaceview();
 
@@ -921,6 +936,7 @@ function get_amount_date_payment(){
   payment_4_list.length=0;
   payment_4_count.length=0;
 
+  //결제 금액
   connection.query("SELECT date_format(date, '%Y-%m-02 00:00:00') 'date', sum(price) 'sum' FROM sms_bank where date between ? and ? group by date_format(date, '%Y-%m-02 00:00:00') order by date_format(date, '%Y-%m-02 00:00:00');",[date_start, date_end], function(err, rows, fields){
     if(!err){
       for(var i=0;i<rows.length;i++){
@@ -934,6 +950,7 @@ function get_amount_date_payment(){
       cc.innerHTML='Error-query-#payment_3-1'+err;
   })
 
+  //누적 금액
   connection.query("SELECT s1.date 'date', sum(s2.sum) 'sum' FROM (SELECT date_format(date, '%Y-%m-02 00:00:00') 'date', sum(price) 'sum' FROM sms_bank where date between ? and ? group by date_format(date, '%Y-%m-02 00:00:00') order by date_format(date, '%Y-%m-02 00:00:00')) s1, (SELECT date_format(date, '%Y-%m-02 00:00:00') 'date', sum(price) 'sum' FROM sms_bank where date between ? and ? group by date_format(date, '%Y-%m-02 00:00:00') order by date_format(date, '%Y-%m-02 00:00:00')) s2 where s1.date>=s2.date group by s1.date order by s1.date;",[date_start, date_end, date_start, date_end], function(err, rows, fields){
     if(!err){
       for(var i=0;i<rows.length;i++){
@@ -955,6 +972,7 @@ function get_amount_date_payment(){
   })
 }
 
+//특정 기간의 결제 시간대 차트 구성
 function get_payment_date_payment(){
   chartspaceview();
   choosed_menu="payment5";
@@ -965,6 +983,8 @@ function get_payment_date_payment(){
   payment_6_list.length=0;
   payment_6_count.length=0;
 
+  //sms_bank_hour 테이블
+  //특정 기간의 시간대별 결제문자 수 저장
   connection.query("drop table if exists sms_bank_hour; create table sms_bank_hour(hour int not null, smscount int, primary key(hour)); set @hour:=-1; insert into sms_bank_hour(hour, smscount) (select (@hour:=@hour+1) 'hour', (select count(*) 'smscount' from sms_bank where date between ? and ? and hour(date)=@hour) 'count' from sms where @hour<23);",[payment_date_start, payment_date_end], function(err, rows, fields){
     if(!err){
       connection.query("select * from sms_bank_hour order by hour;",function(err, rows, fields){
@@ -992,6 +1012,7 @@ function get_payment_date_payment(){
   })
 }
 
+//특정 기간의 카드 이용 순위 차트 구성
 function get_card_date_payment(){
   chartspaceview();
   choosed_menu="payment7";
@@ -1009,6 +1030,7 @@ function get_card_date_payment(){
   payment_10_list.length=0;
   payment_10_count.length=0;
 
+  //결제 횟수
   connection.query("select bname, count(*) 'count' from sms_bank where date between ? and ? group by bname order by count(*) desc;",[card_date_start, card_date_end], function(err, rows, fields){
     if(!err){
       for(var i=0;i<rows.length;i++){
@@ -1022,6 +1044,7 @@ function get_card_date_payment(){
       cc.innerHTML='Error-query-#payment_7-1';
   })
 
+  //결제 금액
   connection.query("select bname, sum(price) 'sum' from sms_bank where date between ? and ? group by bname order by sum(price) desc;",[card_date_start, card_date_end], function(err, rows, fields){
     if(!err){
       for(var i=0;i<rows.length;i++){
@@ -1043,6 +1066,7 @@ function get_card_date_payment(){
   })
 }
 
+//특정 기간의 사용처 이용 순위 차트 구성
 function get_store_date_payment(){
   chartspaceview();
   choosed_menu="payment9";
@@ -1060,6 +1084,7 @@ function get_store_date_payment(){
   payment_14_list.length=0;
   payment_14_count.length=0;
 
+  //결제 횟수
   connection.query("select sname, count(*) 'count' from sms_bank where date between ? and ? group by sname order by count(*) desc;",[store_date_start, store_date_end], function(err, rows, fields){
     if(!err){
       for(var i=0;i<rows.length;i++){
@@ -1073,6 +1098,7 @@ function get_store_date_payment(){
       cc.innerHTML='Error-query-#payment_9-1';
   })
 
+  //결제 금액
   connection.query("select sname, sum(price) 'sum' from sms_bank where date between ? and ? group by sname order by sum(price) desc;",[store_date_start, store_date_end], function(err, rows, fields){
     if(!err){
       for(var i=0;i<rows.length;i++){
@@ -1109,6 +1135,7 @@ connection.query('', function(err, rows, fields){
 });
 */
 
+//키워드 순위/카드 및 사용처 순위 차트의 특정 항목 클릭 시 해당 항목의 상세 내용 출력
 canvas.onclick=function(event){
   var activePoints = myChart.getElementsAtEvent(event);
   var chartData = activePoints[0]['_chart'].config.data;
@@ -1329,6 +1356,7 @@ canvas.onclick=function(event){
   }
 };
 
+//리스트 출력 시 특정 조건에 맞는 데이터 거르는 filter
 var filter0List=[];
 var filter1List=[];
 var filter2List=[];
@@ -1377,6 +1405,7 @@ function filter_listener(event){
   }
 }
 function filter_action(paramlist, checked_temp, filter_temp, value_temp, icon_temp, myList_temp){
+  //체크 시
   if (checked_temp){
     document.getElementById(icon_temp).style="display:inline";
 
@@ -1395,6 +1424,7 @@ function filter_action(paramlist, checked_temp, filter_temp, value_temp, icon_te
         return false;
     });
   }
+  //체크 해제 시
   else{
     document.getElementById(icon_temp).style="display:none";
 
