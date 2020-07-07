@@ -10,7 +10,7 @@
   "author": "Hee <glwjd0414@khu.ac.kr>",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^8.2.0",
+    "electron": "^8.2.4",
     "electron-rebuild": "^1.11.0"
   },
   "dependencies": {
