@@ -16,7 +16,7 @@
   "dependencies": {
     "@google-cloud/vision": "^2.0.0",
     "bootstrap-icons": "^1.0.0-alpha4",
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "@google-cloud/video-intelligence": "^3.0.0",
     "appium-adb": "^7.27.1",
     "electron-log": "^4.2.0",
